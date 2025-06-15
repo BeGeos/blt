@@ -19,7 +19,7 @@ run-dev:
 	APP_ENV=dev go run ./cmd/apps/server.go
 
 run-prod:
-	APP_ENV=prod go run ./cmd/apps/server.go
+	make build && APP_ENV=prod ./bin/$(APP_NAME)
 
 # Run tests
 test:

@@ -2,8 +2,10 @@ package internal
 
 import (
 	"errors"
+	"fmt"
 	"log"
 	"net/http"
+	"os"
 
 	"github.com/joho/godotenv"
 
@@ -11,7 +13,17 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
+func loadEnv(env string) error {
+	err := godotenv.Load(env)
+	if err != nil {
+		return fmt.Errorf("error loading %s file: %w", env, err)
+	}
+	return nil
+}
+
 func Setup(env string, e *echo.Echo) error {
+	fmt.Println("Setting up...")
+
 	switch env {
 	case "dev":
 		setupDev(e)
@@ -26,7 +38,11 @@ func Setup(env string, e *echo.Echo) error {
 
 func setupDev(e *echo.Echo) {
 	log.Println("Setting up development environment")
-	godotenv.Load(".env.local")
+	err := loadEnv(".env.local")
+	if err != nil {
+		log.Println("❌ Failed to load env: %v\n", err)
+		os.Exit(1)
+	}
 
 	e.Use(echoprometheus.NewMiddleware("go-echo")) // adds middleware to gather metrics
 	go func() {
@@ -40,10 +56,20 @@ func setupDev(e *echo.Echo) {
 
 func setupProd() {
 	log.Println("Setting up production environment")
-	godotenv.Load(".env")
+
+	err := loadEnv(".env")
+	if err != nil {
+		log.Println("❌ Failed to load env: %v\n", err)
+		os.Exit(1)
+	}
 }
 
 func setupStaging() {
 	log.Println("Setting up staging environment")
-	godotenv.Load(".env.staging")
+
+	err := loadEnv(".env.staging")
+	if err != nil {
+		log.Println("❌ Failed to load env: %v\n", err)
+		os.Exit(1)
+	}
 }

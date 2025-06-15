@@ -1,0 +1,45 @@
+
+# Binaries
+/bin/
+/build/
+/out/
+/dist/
+
+# Executables
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# Output of 'go test'
+*.test
+
+# Vendor directory (if you vendor dependencies)
+vendor/
+
+# IDE/editor files
+.vscode/
+.idea/
+*.iml
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs and temp files
+*.log
+*.tmp
+
+# Dependency directories (if using dep or other tools)
+Godeps/
+
+# Coverage reports
+coverage.out
+
+# Go workspace file (optional)
+go.work
+
+# Go build cache (optional)
+# This is usually safe to ignore, but Go caches can also be re-built
+# $GOPATH/pkg/mod/cache/

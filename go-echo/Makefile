@@ -18,6 +18,9 @@ build:
 run-dev:
 	APP_ENV=dev go run ./cmd/apps/server.go
 
+run-dev-watch:
+	APP_ENV=dev air -c .air.toml
+
 run-prod:
 	make build && APP_ENV=prod ./bin/$(APP_NAME)
 

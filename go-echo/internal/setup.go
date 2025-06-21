@@ -14,7 +14,7 @@ import (
 	"github.com/BeGeos/go-echo/internal/utils"
 )
 
-func loadEnv() (string, error) {
+func loadEnv() error {
 	Env := utils.GetEnv()
 
 	var envFile string
@@ -28,7 +28,7 @@ func loadEnv() (string, error) {
 	}
 
 	err := godotenv.Load(envFile)
-	return Env, err
+	return err
 }
 
 func checkEnvVariables() error {
@@ -38,7 +38,7 @@ func checkEnvVariables() error {
 
 func Setup(e *echo.Echo) error {
 	fmt.Println("Setting up...")
-	_, err := loadEnv()
+	err := loadEnv()
 	if err != nil {
 		log.Fatalf("❌ Failed to load environment variables: %v\n", err)
 	}

@@ -4,89 +4,56 @@ import (
 	"errors"
 	"fmt"
 	"log"
-	"net/http"
 	"os"
+	"slices"
 
 	"github.com/joho/godotenv"
 	"golang.org/x/time/rate"
 
-	"github.com/labstack/echo-contrib/echoprometheus"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 
 	"github.com/BeGeos/go-echo/internal/configs"
+	"github.com/BeGeos/go-echo/internal/settings"
 )
 
-func loadEnv(env string) error {
-	err := godotenv.Load(env)
-	if err != nil {
-		return fmt.Errorf("error loading %s file: %w", env, err)
+func loadEnv() (string, error) {
+	Env := os.Getenv("APP_ENV")
+	if !slices.Contains(settings.AllowedEnvs, Env) {
+		return "", errors.New("APP_ENV is not set or invalid")
 	}
-	return nil
+
+	var envFile string
+	switch Env {
+	case "dev":
+		envFile = ".env.local"
+	case "prod":
+		envFile = ".env"
+	case "staging":
+		envFile = ".env.staging"
+	}
+
+	err := godotenv.Load(envFile)
+	return Env, err
 }
 
-func checkEnvVariabled() error {
+func checkEnvVariables() error {
 	// these are the variables that must be set in the environment
 	return nil
 }
 
-func setupDev(e *echo.Echo) {
-	log.Println("Setting up development environment")
-	err := loadEnv(".env.local")
-	if err != nil {
-		log.Println("❌ Failed to load env: %v\n", err)
-		os.Exit(1)
-	}
-
-	e.Use(echoprometheus.NewMiddleware("go-echo")) // adds middleware to gather metrics
-
-	go func() {
-		metrics := echo.New()                                // this Echo will run on separate port 8081
-		metrics.GET("/metrics", echoprometheus.NewHandler()) // adds route to serve gathered metrics
-		if err := metrics.Start(":8081"); err != nil && !errors.Is(err, http.ErrServerClosed) {
-			log.Fatal(err)
-		}
-	}()
-}
-
-func setupProd() {
-	log.Println("Setting up production environment")
-
-	err := loadEnv(".env")
-	if err != nil {
-		log.Println("❌ Failed to load env: %v\n", err)
-		os.Exit(1)
-	}
-}
-
-func setupStaging() {
-	log.Println("Setting up staging environment")
-
-	err := loadEnv(".env.staging")
-	if err != nil {
-		log.Println("❌ Failed to load env: %v\n", err)
-		os.Exit(1)
-	}
-}
-
 func Setup(e *echo.Echo) error {
-	Env := os.Getenv("APP_ENV")
 	fmt.Println("Setting up...")
-
-	switch Env {
-	case "dev":
-		setupDev(e)
-	case "prod":
-		setupProd()
-	case "staging":
-		setupStaging()
-	default:
-		return errors.New("APP_ENV is not set or invalid")
+	_, err := loadEnv()
+	if err != nil {
+		log.Fatalf("❌ Failed to load environment variables: %v\n", err)
 	}
+	fmt.Printf("1. Environment variables loaded successfully ✅\n")
 
-	if err := checkEnvVariabled(); err != nil {
-		log.Println("❌ Failed to check env variables: %v\n", err)
+	if err := checkEnvVariables(); err != nil {
+		log.Fatalf("❌ Failed to check env variables: %v\n", err)
 	}
+	fmt.Printf("2. Environment variables checked successfully ✅\n")
 
 	e.Use(middleware.RequestID())
 	e.Use(middleware.RequestLoggerWithConfig(configs.LoggerConfigs))

@@ -13,6 +13,8 @@ import (
 	"github.com/labstack/echo-contrib/echoprometheus"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
+
+	"github.com/BeGeos/go-echo/pkg/logger"
 )
 
 func loadEnv(env string) error {
@@ -25,7 +27,6 @@ func loadEnv(env string) error {
 
 func checkEnvVariabled() error {
 	// these are the variables that must be set in the environment
-	Vars := []string{}
 	return nil
 }
 
@@ -38,6 +39,7 @@ func setupDev(e *echo.Echo) {
 	}
 
 	e.Use(echoprometheus.NewMiddleware("go-echo")) // adds middleware to gather metrics
+
 	go func() {
 		metrics := echo.New()                                // this Echo will run on separate port 8081
 		metrics.GET("/metrics", echoprometheus.NewHandler()) // adds route to serve gathered metrics
@@ -87,7 +89,14 @@ func Setup(e *echo.Echo) error {
 	}
 
 	e.Use(middleware.RequestID())
-	e.Use(middleware.Logger())
+	e.Use(middleware.RequestLoggerWithConfig(middleware.RequestLoggerConfig{
+		LogStatus:     true,
+		LogURI:        true,
+		LogMethod:     true,
+		LogError:      true,
+		HandleError:   true,
+		LogValuesFunc: logger.LogValuesFunc, // custom logging function
+	}))
 	e.Use(middleware.Recover())
 	e.Use(middleware.BodyLimit("10M"))
 	e.Use(middleware.CORS())

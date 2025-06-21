@@ -6,7 +6,7 @@ import (
 )
 
 func getAllowedOrigins() []string {
-	Env := utils.GetEnv()
+	Env := utils.Env
 
 	switch Env {
 	case "dev":

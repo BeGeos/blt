@@ -15,7 +15,7 @@ import (
 )
 
 func loadEnv() error {
-	Env := utils.GetEnv()
+	Env := utils.Env
 
 	var envFile string
 	switch Env {

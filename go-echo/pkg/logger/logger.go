@@ -12,7 +12,7 @@ import (
 )
 
 func getLoggerLevel() slog.Level {
-	Env := utils.GetEnv()
+	Env := utils.Env
 	if Env == "dev" {
 		return slog.LevelDebug
 	}

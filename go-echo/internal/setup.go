@@ -1,11 +1,8 @@
 package internal
 
 import (
-	"errors"
 	"fmt"
 	"log"
-	"os"
-	"slices"
 
 	"github.com/joho/godotenv"
 	"golang.org/x/time/rate"
@@ -14,14 +11,11 @@ import (
 	"github.com/labstack/echo/v4/middleware"
 
 	"github.com/BeGeos/go-echo/internal/configs"
-	"github.com/BeGeos/go-echo/internal/settings"
+	"github.com/BeGeos/go-echo/internal/utils"
 )
 
 func loadEnv() (string, error) {
-	Env := os.Getenv("APP_ENV")
-	if !slices.Contains(settings.AllowedEnvs, Env) {
-		return "", errors.New("APP_ENV is not set or invalid")
-	}
+	Env := utils.GetEnv()
 
 	var envFile string
 	switch Env {
@@ -48,18 +42,18 @@ func Setup(e *echo.Echo) error {
 	if err != nil {
 		log.Fatalf("❌ Failed to load environment variables: %v\n", err)
 	}
-	fmt.Printf("1. Environment variables loaded successfully ✅\n")
+	fmt.Print("1. Environment variables loaded successfully ✅\n")
 
 	if err := checkEnvVariables(); err != nil {
 		log.Fatalf("❌ Failed to check env variables: %v\n", err)
 	}
-	fmt.Printf("2. Environment variables checked successfully ✅\n")
+	fmt.Print("2. Environment variables checked successfully ✅\n")
 
 	e.Use(middleware.RequestID())
 	e.Use(middleware.RequestLoggerWithConfig(configs.LoggerConfigs))
 	e.Use(middleware.Recover())
 	e.Use(middleware.BodyLimit("10M"))
-	e.Use(middleware.CORS())
+	e.Use(middleware.CORSWithConfig(configs.CorsConfig))
 	e.Use(middleware.Gzip())
 	e.Use(middleware.RateLimiter(middleware.NewRateLimiterMemoryStore(rate.Limit(30)))) // 30 requests per second
 	e.Use(middleware.Secure())

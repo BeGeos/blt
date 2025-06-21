@@ -14,7 +14,7 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 
-	"github.com/BeGeos/go-echo/pkg/logger"
+	"github.com/BeGeos/go-echo/internal/configs"
 )
 
 func loadEnv(env string) error {
@@ -89,14 +89,7 @@ func Setup(e *echo.Echo) error {
 	}
 
 	e.Use(middleware.RequestID())
-	e.Use(middleware.RequestLoggerWithConfig(middleware.RequestLoggerConfig{
-		LogStatus:     true,
-		LogURI:        true,
-		LogMethod:     true,
-		LogError:      true,
-		HandleError:   true,
-		LogValuesFunc: logger.LogValuesFunc, // custom logging function
-	}))
+	e.Use(middleware.RequestLoggerWithConfig(configs.LoggerConfigs))
 	e.Use(middleware.Recover())
 	e.Use(middleware.BodyLimit("10M"))
 	e.Use(middleware.CORS())

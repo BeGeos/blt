@@ -1,4 +1,4 @@
-package internal
+package app
 
 import (
 	"fmt"
@@ -10,7 +10,8 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 
-	"github.com/BeGeos/go-echo/internal/configs"
+	"github.com/BeGeos/go-echo/internal/config"
+	"github.com/BeGeos/go-echo/internal/handlers"
 	"github.com/BeGeos/go-echo/internal/utils"
 )
 
@@ -36,7 +37,9 @@ func checkEnvVariables() error {
 	return nil
 }
 
-func Setup(e *echo.Echo) error {
+func Setup() *echo.Echo {
+	e := echo.New()
+
 	fmt.Println("Setting up...")
 	err := loadEnv()
 	if err != nil {
@@ -50,14 +53,16 @@ func Setup(e *echo.Echo) error {
 	fmt.Print("2. Environment variables checked successfully ✅\n")
 
 	e.Use(middleware.RequestID())
-	e.Use(middleware.RequestLoggerWithConfig(configs.LoggerConfigs))
+	e.Use(middleware.RequestLoggerWithConfig(config.LoggerConfigs))
 	e.Use(middleware.Recover())
 	e.Use(middleware.BodyLimit("10M"))
-	e.Use(middleware.CORSWithConfig(configs.CorsConfig))
+	e.Use(middleware.CORSWithConfig(config.CorsConfig))
 	e.Use(middleware.Gzip())
 	e.Use(middleware.RateLimiter(middleware.NewRateLimiterMemoryStore(rate.Limit(30)))) // 30 requests per second
 	e.Use(middleware.Secure())
 	e.Use(middleware.Timeout())
 
-	return nil
+	e.HTTPErrorHandler = handlers.ErrorHandler // custom error handler
+
+	return e
 }

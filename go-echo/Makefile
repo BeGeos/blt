@@ -12,11 +12,11 @@ all: build
 
 # Build the binary
 build:
-	go build -o bin/$(APP_NAME) ./cmd
+	go build -o bin/$(APP_NAME) ./cmd/server
 
 # Run the app (useful for small projects)
 run-dev:
-	APP_ENV=dev go run ./cmd/server.go
+	APP_ENV=dev go run ./cmd/server
 
 run-dev-watch:
 	APP_ENV=dev air -c .air.toml

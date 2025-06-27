@@ -8,11 +8,11 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 
-	"github.com/BeGeos/go-echo/internal/utils"
+	"github.com/BeGeos/go-echo/internal/settings"
 )
 
 func getLoggerLevel() slog.Level {
-	Env := utils.Env
+	Env := settings.Env
 	if Env == "dev" {
 		return slog.LevelDebug
 	}

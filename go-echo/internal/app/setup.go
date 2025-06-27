@@ -13,11 +13,11 @@ import (
 	"github.com/BeGeos/go-echo/internal/config"
 	"github.com/BeGeos/go-echo/internal/handlers"
 	"github.com/BeGeos/go-echo/internal/router"
-	"github.com/BeGeos/go-echo/internal/utils"
+	"github.com/BeGeos/go-echo/internal/settings"
 )
 
 func loadEnv() error {
-	Env := utils.Env
+	Env := settings.Env
 
 	var envFile string
 	switch Env {

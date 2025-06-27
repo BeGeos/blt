@@ -7,7 +7,7 @@ import (
 
 	"github.com/labstack/echo/v4"
 
-	"github.com/BeGeos/go-echo/internal/utils"
+	"github.com/BeGeos/go-echo/internal/settings"
 )
 
 type ErrorResponse struct {
@@ -18,7 +18,7 @@ type ErrorResponse struct {
 }
 
 func ErrorHandler(err error, c echo.Context) {
-	Env := utils.Env
+	Env := settings.Env
 	// Default values
 	code := http.StatusInternalServerError
 	msg := "Internal Server Error"

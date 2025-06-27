@@ -12,6 +12,7 @@ import (
 
 	"github.com/BeGeos/go-echo/internal/config"
 	"github.com/BeGeos/go-echo/internal/handlers"
+	"github.com/BeGeos/go-echo/internal/router"
 	"github.com/BeGeos/go-echo/internal/utils"
 )
 
@@ -63,6 +64,8 @@ func Setup() *echo.Echo {
 	e.Use(middleware.Timeout())
 
 	e.HTTPErrorHandler = handlers.ErrorHandler // custom error handler
+
+	router.RegisterRoutes(e) // register routes
 
 	return e
 }

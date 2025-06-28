@@ -6,7 +6,7 @@ import (
 )
 
 func RegisterRootRoutes(e *echo.Echo) {
-	e.GET("/", handlers.RootHandler)
+	e.GET("/", handlers.RootHandler).Name = "home"
 
-	e.GET("/ping", handlers.HealthCheckHandler)
+	e.GET("/ping", handlers.HealthCheckHandler).Name = "ping"
 }

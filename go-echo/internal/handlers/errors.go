@@ -7,15 +7,9 @@ import (
 
 	"github.com/labstack/echo/v4"
 
+	"github.com/BeGeos/go-echo/internal/schema"
 	"github.com/BeGeos/go-echo/internal/settings"
 )
-
-type ErrorResponse struct {
-	Error   bool   `json:"error"`
-	Message string `json:"message"`
-	Code    int    `json:"code,omitempty"`  // optional
-	Stack   string `json:"stack,omitempty"` // optional
-}
 
 func ErrorHandler(err error, c echo.Context) {
 	Env := settings.Env
@@ -38,7 +32,7 @@ func ErrorHandler(err error, c echo.Context) {
 	}
 
 	// Send a JSON response
-	res := ErrorResponse{
+	res := schema.ErrorResponse{
 		Error:   true,
 		Message: msg,
 		Code:    code,

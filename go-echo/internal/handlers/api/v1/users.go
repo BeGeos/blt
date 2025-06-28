@@ -26,5 +26,5 @@ func (h *UserHandler) List(c echo.Context) error {
 
 func (h *UserHandler) Get(c echo.Context) error {
 	userID := c.Param("id")
-	return c.JSON(http.StatusOK, schema.BaseResponse{Message: "this is user " + userID})
+	return c.JSON(http.StatusOK, &schema.BaseResponse{Message: "this is user " + userID})
 }

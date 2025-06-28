@@ -11,7 +11,7 @@ type AuthHandler struct{}
 
 func (h *AuthHandler) Login(c echo.Context) error {
 	// implement your login logic here
-	return c.JSON(http.StatusOK, schema.AuthResponse{
+	return c.JSON(http.StatusOK, &schema.AuthResponse{
 		Status: "success",
 		Token:  "example",
 	})
@@ -19,14 +19,14 @@ func (h *AuthHandler) Login(c echo.Context) error {
 
 func (h *AuthHandler) Logout(c echo.Context) error {
 	// implement your login logic here
-	return c.JSON(http.StatusOK, schema.AuthResponse{
+	return c.JSON(http.StatusOK, &schema.AuthResponse{
 		Status: "success",
 	})
 }
 
 func (h *AuthHandler) Register(c echo.Context) error {
 	// implement your login logic here
-	return c.JSON(http.StatusOK, schema.AuthResponse{
+	return c.JSON(http.StatusOK, &schema.AuthResponse{
 		Status: "success",
 		Token:  "example",
 	})
@@ -34,7 +34,7 @@ func (h *AuthHandler) Register(c echo.Context) error {
 
 func (h *AuthHandler) Me(c echo.Context) error {
 	// implement your login logic here
-	return c.JSON(http.StatusOK, schema.AuthResponse{
+	return c.JSON(http.StatusOK, &schema.AuthResponse{
 		Status: "success",
 		Token:  "example",
 	})
@@ -42,7 +42,7 @@ func (h *AuthHandler) Me(c echo.Context) error {
 
 func (h *AuthHandler) Refresh(c echo.Context) error {
 	// implement your login logic here
-	return c.JSON(http.StatusOK, schema.AuthResponse{
+	return c.JSON(http.StatusOK, &schema.AuthResponse{
 		Status: "success",
 		Token:  "example",
 	})

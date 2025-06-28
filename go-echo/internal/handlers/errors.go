@@ -32,7 +32,7 @@ func ErrorHandler(err error, c echo.Context) {
 	}
 
 	// Send a JSON response
-	res := schema.ErrorResponse{
+	res := &schema.ErrorResponse{
 		Error:   true,
 		Message: msg,
 		Code:    code,

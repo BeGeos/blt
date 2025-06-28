@@ -2,10 +2,12 @@ package config
 
 import (
 	"github.com/labstack/echo/v4/middleware"
+
+	"github.com/BeGeos/go-echo/internal/settings"
 )
 
 func getAllowedOrigins() []string {
-	switch Env {
+	switch settings.Env {
 	case "dev":
 		return []string{"*"}
 	case "prod":

@@ -7,6 +7,11 @@ import (
 
 var LoggerConfigs = middleware.RequestLoggerConfig{
 	LogStatus:     true,
+	LogLatency:    true,
+	LogProtocol:   true,
+	LogRequestID:  true,
+	LogRemoteIP:   true,
+	LogUserAgent:  true,
 	LogURI:        true,
 	LogMethod:     true,
 	LogError:      true,

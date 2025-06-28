@@ -3,6 +3,7 @@ package app
 import (
 	"fmt"
 	"log"
+	"time"
 
 	"github.com/joho/godotenv"
 	"golang.org/x/time/rate"
@@ -56,12 +57,14 @@ func Setup() *echo.Echo {
 	e.Use(middleware.RequestID())
 	e.Use(middleware.RequestLoggerWithConfig(config.LoggerConfigs))
 	e.Use(middleware.Recover())
-	e.Use(middleware.BodyLimit("10M"))
+	e.Use(middleware.BodyLimit("5M"))
 	e.Use(middleware.CORSWithConfig(config.CorsConfig))
 	e.Use(middleware.Gzip())
 	e.Use(middleware.RateLimiter(middleware.NewRateLimiterMemoryStore(rate.Limit(30)))) // 30 requests per second
 	e.Use(middleware.Secure())
-	e.Use(middleware.Timeout())
+	e.Use(middleware.TimeoutWithConfig(middleware.TimeoutConfig{
+		Timeout: 30 * time.Second, // 30 seconds timeout
+	}))
 
 	e.HTTPErrorHandler = handlers.ErrorHandler // custom error handler
 

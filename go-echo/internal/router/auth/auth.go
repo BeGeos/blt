@@ -26,7 +26,7 @@ func RegisterAuthRoutes(e *echo.Echo) {
 
 	// must not be authenticated
 	notAuthenticated := g.Group("")
-	notAuthenticated.Use(echojwt.WithConfig(config.JwtNotAuthenticatedConfig))
+	notAuthenticated.Use(echojwt.WithConfig(config.JwtMaybeAuthenticatedConfig))
 
 	notAuthenticated.POST("/login", authHandler.Login).Name = "auth:login"
 	notAuthenticated.POST("/register", authHandler.Register).Name = "auth:register"

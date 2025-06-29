@@ -34,6 +34,6 @@ func getJwtConfig(args Args) echojwt.Config {
 }
 
 var (
-	JwtAuthenticatedConfig    = getJwtConfig(Args{authenticationRequired: true})
-	JwtNotAuthenticatedConfig = getJwtConfig(Args{authenticationRequired: false})
+	JwtAuthenticatedConfig      = getJwtConfig(Args{authenticationRequired: true})
+	JwtMaybeAuthenticatedConfig = getJwtConfig(Args{authenticationRequired: false})
 )

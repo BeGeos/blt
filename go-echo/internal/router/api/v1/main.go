@@ -1,4 +1,4 @@
-package v1_router
+package router
 
 import (
 	"github.com/labstack/echo/v4"

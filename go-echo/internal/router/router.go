@@ -3,8 +3,8 @@ package router
 import (
 	"github.com/labstack/echo/v4"
 
-	"github.com/BeGeos/go-echo/internal/router/api"
-	"github.com/BeGeos/go-echo/internal/router/auth"
+	api "github.com/BeGeos/go-echo/internal/router/api"
+	auth "github.com/BeGeos/go-echo/internal/router/auth"
 )
 
 func RegisterRoutes(e *echo.Echo) {

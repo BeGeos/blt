@@ -1,7 +1,7 @@
-package auth
+package router
 
 import (
-	auth_handlers "github.com/BeGeos/go-echo/internal/handlers/auth"
+	handlers "github.com/BeGeos/go-echo/internal/handlers/auth"
 	auth_services "github.com/BeGeos/go-echo/internal/services/auth"
 	"github.com/labstack/echo/v4"
 )
@@ -9,7 +9,7 @@ import (
 func RegisterAuthRoutes(e *echo.Echo) {
 	g := e.Group("/auth")
 
-	authHandler := &auth_handlers.AuthHandler{
+	authHandler := &handlers.AuthHandler{
 		Jwt: &auth_services.JwtService{},
 	}
 

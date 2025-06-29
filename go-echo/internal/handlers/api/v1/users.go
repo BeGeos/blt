@@ -1,4 +1,4 @@
-package v1_handlers
+package handlers
 
 import (
 	"net/http"
@@ -7,9 +7,9 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-type UserHandler struct{}
+type UserHandlerV1 struct{}
 
-func (h *UserHandler) List(c echo.Context) error {
+func (h *UserHandlerV1) List(c echo.Context) error {
 	type User struct {
 		Name  string `json:"name"`
 		Email string `json:"email"`
@@ -24,7 +24,7 @@ func (h *UserHandler) List(c echo.Context) error {
 	return c.JSON(http.StatusOK, users)
 }
 
-func (h *UserHandler) Get(c echo.Context) error {
+func (h *UserHandlerV1) Get(c echo.Context) error {
 	userID := c.Param("id")
 	return c.JSON(http.StatusOK, &schema.BaseResponse{Message: "this is user " + userID})
 }

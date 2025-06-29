@@ -1,4 +1,4 @@
-package auth_handlers
+package handlers
 
 import (
 	"errors"
@@ -33,6 +33,7 @@ func (h *AuthHandler) Login(c echo.Context) error {
 
 func (h *AuthHandler) Logout(c echo.Context) error {
 	// implement your login logic here
+	// increment user token version or invalidate the token
 	return c.JSON(http.StatusOK, &schema.AuthResponse{
 		Status: "success",
 	})

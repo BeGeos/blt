@@ -9,11 +9,24 @@ import (
 	"github.com/BeGeos/go-echo/internal/settings"
 )
 
+var contextKey = settings.JwtContextKey
+
 type Args struct {
 	authenticationRequired bool
 }
 
 func successHandler(c echo.Context) {
+	token, ok := c.Get(contextKey).(*jwt.Token)
+	if ok {
+		claims, _ := token.Claims.(*auth_services.JwtClaims)
+
+		person := claims.UserID
+		version := claims.Version
+
+		// fetch person from database and put into context
+		c.Set("person", person)
+		c.Set("version", version)
+	}
 }
 
 func newClaimsFunc(c echo.Context) jwt.Claims {
@@ -27,7 +40,7 @@ func getJwtConfig(args Args) echojwt.Config {
 			return auth == "" && !args.authenticationRequired
 		},
 		SuccessHandler: successHandler,
-		ContextKey:     "tkn",
+		ContextKey:     contextKey,
 		SigningKey:     []byte(settings.JwtSecretKey),
 		NewClaimsFunc:  newClaimsFunc,
 	}

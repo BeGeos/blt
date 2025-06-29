@@ -23,4 +23,7 @@ var AllowedEnvs = []string{"dev", "prod", "staging"}
 
 // Authentication settings
 
-var JwtSecretKey = getEnvKey("JWT_SECRET_KEY", "")
+var (
+	JwtSecretKey  = getEnvKey("JWT_SECRET_KEY", "")
+	JwtContextKey = getEnvKey("JWT_CONTEXT_KEY", "tkn")
+)

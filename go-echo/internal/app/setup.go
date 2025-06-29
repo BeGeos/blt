@@ -5,7 +5,6 @@ import (
 	"log"
 	"time"
 
-	"github.com/joho/godotenv"
 	"golang.org/x/time/rate"
 
 	"github.com/labstack/echo/v4"
@@ -17,23 +16,6 @@ import (
 	"github.com/BeGeos/go-echo/internal/settings"
 )
 
-func loadEnv() error {
-	Env := settings.Env
-
-	var envFile string
-	switch Env {
-	case "dev":
-		envFile = ".env.local"
-	case "prod":
-		envFile = ".env"
-	case "staging":
-		envFile = ".env.staging"
-	}
-
-	err := godotenv.Load(envFile)
-	return err
-}
-
 func checkEnvVariables() error {
 	// these are the variables that must be set in the environment
 	return nil
@@ -43,7 +25,7 @@ func Setup() *echo.Echo {
 	e := echo.New()
 
 	fmt.Println("Setting up...")
-	err := loadEnv()
+	err := settings.LoadEnv()
 	if err != nil {
 		log.Fatalf("❌ Failed to load environment variables: %v\n", err)
 	}

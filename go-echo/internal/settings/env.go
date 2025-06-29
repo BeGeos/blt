@@ -4,15 +4,32 @@ import (
 	"log"
 	"os"
 	"slices"
+
+	"github.com/joho/godotenv"
 )
 
-func GetEnv() string {
-	Env := os.Getenv(AppEnvKey)
-	if !slices.Contains(AllowedEnvs, Env) {
-		log.Fatalf("APP_ENV is not set or invalid: %s", Env)
+func LoadEnv() error {
+	var envFile string
+	switch Env {
+	case "dev":
+		envFile = ".env.local"
+	case "prod":
+		envFile = ".env"
+	case "staging":
+		envFile = ".env.staging"
 	}
 
-	return Env
+	err := godotenv.Load(envFile)
+	return err
+}
+
+func GetEnv() string {
+	env := os.Getenv(AppEnvKey)
+	if !slices.Contains(AllowedEnvs, env) {
+		log.Fatalf("APP_ENV is not set or invalid: %s", env)
+	}
+
+	return env
 }
 
 var Env = GetEnv()

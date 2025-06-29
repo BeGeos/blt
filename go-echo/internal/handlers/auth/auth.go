@@ -1,19 +1,33 @@
 package auth_handlers
 
 import (
+	"errors"
 	"net/http"
 
 	"github.com/BeGeos/go-echo/internal/schema"
+	auth_services "github.com/BeGeos/go-echo/internal/services/auth"
 	"github.com/labstack/echo/v4"
 )
 
-type AuthHandler struct{}
+type AuthHandler struct {
+	Jwt *auth_services.JwtService
+}
 
 func (h *AuthHandler) Login(c echo.Context) error {
 	// implement your login logic here
+
+	claims := auth_services.PersonClaims{
+		UserID:  1,
+		Version: 1,
+	}
+	token, err := h.Jwt.NewToken(claims)
+	if err != nil {
+		return errors.New("Failed to create token")
+	}
+
 	return c.JSON(http.StatusOK, &schema.AuthResponse{
 		Status: "success",
-		Token:  "example",
+		Token:  token,
 	})
 }
 

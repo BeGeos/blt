@@ -16,17 +16,42 @@ type AuthHandler struct {
 func (h *AuthHandler) Login(c echo.Context) error {
 	// implement your login logic here
 
-	claims := auth_services.AccessTokenClaims{
-		UserID: 1,
+	type ResultCh struct {
+		token string
+		err   error
 	}
-	token, err := h.Jwt.NewAccessToken(claims)
-	if err != nil {
+
+	accessCh := make(chan ResultCh)
+	refreshCh := make(chan ResultCh)
+
+	go func() {
+		claims := auth_services.AccessTokenClaims{
+			UserID: 1,
+		}
+		token, err := h.Jwt.NewAccessToken(claims)
+		accessCh <- ResultCh{token: token, err: err}
+	}()
+
+	go func() {
+		claims := auth_services.RefreshTokenClaims{
+			UserID:  1,
+			Version: 1, // replace with actual version check logic
+		}
+		token, err := h.Jwt.NewRefreshToken(claims)
+		refreshCh <- ResultCh{token: token, err: err}
+	}()
+
+	accessResult := <-accessCh
+	refreshResult := <-refreshCh
+
+	if accessResult.err != nil || refreshResult.err != nil {
 		return errors.New("Failed to create token")
 	}
 
-	return c.JSON(http.StatusOK, &schema.AuthResponse{
-		Status: "success",
-		Token:  token,
+	return c.JSON(http.StatusOK, &schema.LoginResponse{
+		Status:       "success",
+		AccessToken:  accessResult.token,
+		RefreshToken: refreshResult.token,
 	})
 }
 

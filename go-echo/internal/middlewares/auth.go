@@ -25,14 +25,21 @@ func ValidateRefreshToken(next echo.HandlerFunc) echo.HandlerFunc {
 			return echo.ErrBadRequest
 		}
 
-		token, err := jwt.Parse(req.Token, func(*jwt.Token) (interface{}, error) {
-			return settings.JwtSecretKey, nil
-		})
+		if err := c.Validate(&req); err != nil {
+			return err
+		}
+
+		token, err := jwt.ParseWithClaims(
+			req.Token,
+			&auth_services.RefreshJwtClaims{},
+			func(*jwt.Token) (interface{}, error) {
+				return []byte(settings.JwtSecretKey), nil
+			})
 		if err != nil || !token.Valid {
 			return echo.ErrUnauthorized
 		}
 
-		claims, ok := token.Claims.(auth_services.RefreshJwtClaims)
+		claims, ok := token.Claims.(*auth_services.RefreshJwtClaims)
 		if !ok {
 			return echo.ErrUnauthorized
 		}

@@ -21,11 +21,9 @@ func successHandler(c echo.Context) {
 		claims, _ := token.Claims.(*auth_services.JwtClaims)
 
 		person := claims.UserID
-		version := claims.Version
 
 		// fetch person from database and put into context
 		c.Set("person", person)
-		c.Set("version", version)
 	}
 }
 

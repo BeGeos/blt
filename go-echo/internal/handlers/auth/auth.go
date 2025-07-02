@@ -16,11 +16,10 @@ type AuthHandler struct {
 func (h *AuthHandler) Login(c echo.Context) error {
 	// implement your login logic here
 
-	claims := auth_services.PersonClaims{
-		UserID:  1,
-		Version: 1,
+	claims := auth_services.AccessTokenClaims{
+		UserID: 1,
 	}
-	token, err := h.Jwt.NewToken(claims)
+	token, err := h.Jwt.NewAccessToken(claims)
 	if err != nil {
 		return errors.New("Failed to create token")
 	}

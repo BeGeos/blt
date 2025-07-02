@@ -1,4 +1,4 @@
-package auth_services
+package services
 
 import (
 	"time"
@@ -9,25 +9,50 @@ import (
 
 var jwtSecret = []byte(settings.JwtSecretKey)
 
-type PersonClaims struct {
+type AccessTokenClaims struct {
+	UserID uint `json:"user_id"`
+}
+
+type RefreshTokenClaims struct {
 	UserID  uint `json:"user_id"`
 	Version uint `json:"version"`
 }
+
 type JwtClaims struct {
-	PersonClaims
+	AccessTokenClaims
+	jwt.RegisteredClaims
+}
+
+type RefreshJwtClaims struct {
+	RefreshTokenClaims
 	jwt.RegisteredClaims
 }
 
 type JwtService struct{}
 
-func (s *JwtService) NewToken(c PersonClaims) (string, error) {
+func (s *JwtService) NewAccessToken(c AccessTokenClaims) (string, error) {
 	claims := &JwtClaims{
-		PersonClaims: PersonClaims{
+		AccessTokenClaims: AccessTokenClaims{
+			UserID: c.UserID,
+		},
+		RegisteredClaims: jwt.RegisteredClaims{
+			ExpiresAt: jwt.NewNumericDate(time.Now().Add(10 * time.Minute)),
+			IssuedAt:  jwt.NewNumericDate(time.Now()),
+		},
+	}
+
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+	return token.SignedString(jwtSecret)
+}
+
+func (s *JwtService) NewRefreshToken(c RefreshTokenClaims) (string, error) {
+	claims := &RefreshJwtClaims{
+		RefreshTokenClaims: RefreshTokenClaims{
 			UserID:  c.UserID,
 			Version: c.Version,
 		},
 		RegisteredClaims: jwt.RegisteredClaims{
-			ExpiresAt: jwt.NewNumericDate(time.Now().Add(24 * time.Hour)),
+			ExpiresAt: jwt.NewNumericDate(time.Now().Add(24 * 30 * time.Hour)),
 			IssuedAt:  jwt.NewNumericDate(time.Now()),
 		},
 	}

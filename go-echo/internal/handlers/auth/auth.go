@@ -55,9 +55,20 @@ func (h *AuthHandler) Me(c echo.Context) error {
 }
 
 func (h *AuthHandler) Refresh(c echo.Context) error {
-	// implement your login logic here
+	person, _ := c.Get("person").(uint) // add casting when person model is defined
+
+	const version = 1 // replace with actual version check logic when person
+	claims := auth_services.AccessTokenClaims{
+		UserID: person,
+	}
+
+	token, err := h.Jwt.NewAccessToken(claims)
+	if err != nil {
+		return errors.New("Failed to create token")
+	}
+
 	return c.JSON(http.StatusOK, &schema.AuthResponse{
 		Status: "success",
-		Token:  "example",
+		Token:  token,
 	})
 }

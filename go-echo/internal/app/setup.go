@@ -7,6 +7,7 @@ import (
 
 	"golang.org/x/time/rate"
 
+	"github.com/go-playground/validator/v10"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 
@@ -14,6 +15,7 @@ import (
 	"github.com/BeGeos/go-echo/internal/handlers"
 	"github.com/BeGeos/go-echo/internal/router"
 	"github.com/BeGeos/go-echo/internal/settings"
+	"github.com/BeGeos/go-echo/internal/validators"
 )
 
 func checkEnvVariables() error {
@@ -49,6 +51,7 @@ func Setup() *echo.Echo {
 	}))
 
 	e.HTTPErrorHandler = handlers.ErrorHandler // custom error handler
+	e.Validator = &validators.RequestValidator{Validator: validator.New()}
 
 	router.RegisterRoutes(e) // register routes
 

@@ -3,6 +3,7 @@ package router
 import (
 	echojwt "github.com/labstack/echo-jwt/v4"
 	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
 
 	"github.com/BeGeos/go-echo/internal/config"
 	handlers "github.com/BeGeos/go-echo/internal/handlers/auth"
@@ -11,7 +12,7 @@ import (
 )
 
 func RegisterAuthRoutes(e *echo.Echo) {
-	g := e.Group("/auth")
+	g := e.Group("/auth") // limited to 5 requests per minute
 
 	authHandler := &handlers.AuthHandler{
 		Auth: &services.AuthService{},
@@ -24,11 +25,20 @@ func RegisterAuthRoutes(e *echo.Echo) {
 	authenticated.POST("/logout", authHandler.Logout).Name = "auth:logout"
 
 	// must not be authenticated
-	notAuthenticated := g.Group("", echojwt.WithConfig(config.JwtMaybeAuthenticatedConfig), middlewares.NotAuthenticated)
+	notAuthenticated := g.Group(
+		"",
+		middleware.RateLimiterWithConfig(config.GetAuthenticationRateLimiterConfig()),
+		echojwt.WithConfig(config.JwtMaybeAuthenticatedConfig),
+		middlewares.NotAuthenticated,
+	)
 
 	notAuthenticated.POST("/login", authHandler.Login).Name = "auth:login"
 	notAuthenticated.POST("/register", authHandler.Register).Name = "auth:register"
 
-	maybeAuthenticated := g.Group("", middlewares.ValidateRefreshToken) // one-handler group for documentation purposes
+	maybeAuthenticated := g.Group(
+		"",
+		middleware.RateLimiterWithConfig(config.GetAuthenticationRateLimiterConfig()),
+		middlewares.ValidateRefreshToken,
+	) // one-handler group for documentation purposes
 	maybeAuthenticated.POST("/refresh", authHandler.Refresh).Name = "auth:refresh"
 }

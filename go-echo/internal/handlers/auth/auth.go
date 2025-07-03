@@ -3,9 +3,11 @@ package handlers
 import (
 	"net/http"
 
+	"github.com/labstack/echo/v4"
+
+	"github.com/BeGeos/go-echo/internal/dto"
 	"github.com/BeGeos/go-echo/internal/schema"
 	auth_services "github.com/BeGeos/go-echo/internal/services/auth"
-	"github.com/labstack/echo/v4"
 )
 
 type AuthHandler struct {
@@ -29,13 +31,8 @@ func (h *AuthHandler) Logout(c echo.Context) error {
 	return c.JSON(http.StatusNoContent, map[string]string{})
 }
 
-type RegisterRequestData struct {
-	Email    string `json:"email" validate:"required,email"`
-	Password string `json:"password" validate:"required,min=6"`
-}
-
 func (h *AuthHandler) Register(c echo.Context) error {
-	var req RegisterRequestData
+	var req dto.RegisterRequestDto
 	if err := c.Bind(&req); err != nil {
 		return echo.ErrBadRequest
 	}
@@ -78,4 +75,33 @@ func (h *AuthHandler) Refresh(c echo.Context) error {
 	return c.JSON(http.StatusOK, &schema.TokenResponse{
 		AccessToken: token,
 	})
+}
+
+func (h *AuthHandler) ResetPasswordRequest(c echo.Context) error {
+	var req dto.ResetPasswordRequestDto
+	if err := c.Bind(&req); err != nil {
+		return echo.ErrBadRequest
+	}
+
+	if err := c.Validate(&req); err != nil {
+		return err
+	}
+
+	// generate reset password code and send email
+	// either person exists or not, we return 204 No Content
+	return c.JSON(http.StatusNoContent, map[string]string{})
+}
+
+func (h *AuthHandler) ResetPassword(c echo.Context) error {
+	var req dto.ResetPasswordDto
+	if err := c.Bind(&req); err != nil {
+		return echo.ErrBadRequest
+	}
+
+	if err := c.Validate(&req); err != nil {
+		return err
+	}
+
+	// look for token and fetch person
+	return c.JSON(http.StatusNoContent, map[string]string{})
 }

@@ -34,6 +34,8 @@ func RegisterAuthRoutes(e *echo.Echo) {
 
 	notAuthenticated.POST("/login", authHandler.Login).Name = "auth:login"
 	notAuthenticated.POST("/register", authHandler.Register).Name = "auth:register"
+	notAuthenticated.POST("/reset-password", authHandler.ResetPasswordRequest).Name = "auth:reset-password-request"
+	notAuthenticated.POST("/reset-password/:token", authHandler.ResetPassword).Name = "auth:reset-password"
 
 	maybeAuthenticated := g.Group(
 		"",

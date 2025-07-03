@@ -14,8 +14,6 @@ type AuthHandler struct {
 }
 
 func (h *AuthHandler) Login(c echo.Context) error {
-	// implement your login logic here
-
 	type ResultCh struct {
 		token string
 		err   error
@@ -58,9 +56,7 @@ func (h *AuthHandler) Login(c echo.Context) error {
 func (h *AuthHandler) Logout(c echo.Context) error {
 	// implement your login logic here
 	// increment user token version or invalidate the token
-	return c.JSON(http.StatusOK, &schema.AuthResponse{
-		Status: "success",
-	})
+	return c.JSON(http.StatusNoContent, map[string]string{})
 }
 
 func (h *AuthHandler) Register(c echo.Context) error {

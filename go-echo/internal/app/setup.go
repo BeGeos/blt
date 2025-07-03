@@ -3,6 +3,8 @@ package app
 import (
 	"fmt"
 	"log"
+	"net/http"
+	_ "net/http/pprof"
 	"time"
 
 	"golang.org/x/time/rate"
@@ -21,6 +23,10 @@ import (
 func checkEnvVariables() error {
 	// these are the variables that must be set in the environment
 	return nil
+}
+
+func addPprofRoutes(e *echo.Echo) {
+	e.GET("/debug/*", echo.WrapHandler(http.DefaultServeMux))
 }
 
 func Setup() *echo.Echo {
@@ -54,6 +60,11 @@ func Setup() *echo.Echo {
 	e.Validator = &validators.RequestValidator{Validator: validator.New()}
 
 	router.RegisterRoutes(e) // register routes
+
+	if env := settings.Env; env == settings.EnvDevelopment {
+		addPprofRoutes(e) // add pprof routes for debugging
+		fmt.Println("3. Pprof routes added for debugging ✅")
+	}
 
 	return e
 }

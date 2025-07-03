@@ -14,7 +14,7 @@ func RegisterAuthRoutes(e *echo.Echo) {
 	g := e.Group("/auth")
 
 	authHandler := &handlers.AuthHandler{
-		Jwt: &services.JwtService{},
+		Auth: &services.AuthService{},
 	}
 
 	// requires authentication

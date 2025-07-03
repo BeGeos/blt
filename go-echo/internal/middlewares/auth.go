@@ -8,7 +8,7 @@ import (
 	"github.com/BeGeos/go-echo/internal/settings"
 )
 
-type RefreshTokenRequest struct {
+type RefreshTokenRequestData struct {
 	Token string `json:"token" validate:"required"`
 }
 
@@ -21,7 +21,7 @@ type RefreshTokenRequest struct {
 // If everything is ok, set the person in the context and call next handler
 func ValidateRefreshToken(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
-		var req RefreshTokenRequest
+		var req RefreshTokenRequestData
 		if err := c.Bind(&req); err != nil {
 			return echo.ErrBadRequest
 		}

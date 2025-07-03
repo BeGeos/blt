@@ -24,22 +24,22 @@ func (h *AuthHandler) Login(c echo.Context) error {
 	accessCh := make(chan ResultCh)
 	refreshCh := make(chan ResultCh)
 
-	go func() {
+	go func(ch chan ResultCh) {
 		claims := auth_services.AccessTokenClaims{
 			UserID: 1,
 		}
 		token, err := h.Jwt.NewAccessToken(claims)
-		accessCh <- ResultCh{token: token, err: err}
-	}()
+		ch <- ResultCh{token: token, err: err}
+	}(accessCh)
 
-	go func() {
+	go func(ch chan ResultCh) {
 		claims := auth_services.RefreshTokenClaims{
 			UserID:  1,
 			Version: 1, // replace with actual version check logic
 		}
 		token, err := h.Jwt.NewRefreshToken(claims)
-		refreshCh <- ResultCh{token: token, err: err}
-	}()
+		ch <- ResultCh{token: token, err: err}
+	}(refreshCh)
 
 	accessResult := <-accessCh
 	refreshResult := <-refreshCh

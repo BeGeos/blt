@@ -11,12 +11,12 @@ import (
 func LoadEnv() error {
 	var envFile string
 	switch Env {
-	case "dev":
+	case EnvDevelopment:
 		envFile = ".env.local"
-	case "prod":
-		envFile = ".env"
-	case "staging":
+	case EnvStaging:
 		envFile = ".env.staging"
+	case EnvProduction:
+		envFile = ".env"
 	}
 
 	err := godotenv.Load(envFile)

@@ -19,7 +19,13 @@ func getEnvKey(key, defaultValue string) string {
 
 const AppEnvKey = "APP_ENV"
 
-var AllowedEnvs = []string{"dev", "prod", "staging"}
+const (
+	EnvDevelopment = "dev"
+	EnvStaging     = "staging"
+	EnvProduction  = "prod"
+)
+
+var AllowedEnvs = []string{EnvDevelopment, EnvStaging, EnvProduction}
 
 // Authentication settings
 

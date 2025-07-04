@@ -18,6 +18,7 @@ import (
 	"github.com/BeGeos/go-echo/internal/router"
 	"github.com/BeGeos/go-echo/internal/settings"
 	"github.com/BeGeos/go-echo/internal/validators"
+	"github.com/BeGeos/go-echo/pkg/sentry"
 )
 
 func checkEnvVariables() error {
@@ -29,20 +30,46 @@ func addPprofRoutes(e *echo.Echo) {
 	e.GET("/debug/*", echo.WrapHandler(http.DefaultServeMux))
 }
 
+type Stepper struct {
+	start *int
+}
+
+func (s *Stepper) increment() {
+	*s.start++
+}
+
+func (s *Stepper) decrement() {
+	*s.start--
+}
+
 func Setup() *echo.Echo {
-	e := echo.New()
+	env, step := settings.Env, 1
+	stepper := &Stepper{start: &step}
 
 	fmt.Println("Setting up...")
+
+	// Activate Sentry for error tracking
+	tracing := &sentry.Client{Options: sentry.GetSentryClientOptions(env)}
+	if err := tracing.Init(); err != nil {
+		log.Fatalf("sentry client init error: %v", err)
+	}
+	fmt.Printf("%d. Sentry Client init successfully ✅\n", step)
+	stepper.increment()
+
+	e := echo.New()
+
 	err := settings.LoadEnv()
 	if err != nil {
 		log.Fatalf("❌ Failed to load environment variables: %v\n", err)
 	}
-	fmt.Print("1. Environment variables loaded successfully ✅\n")
+	fmt.Printf("%d. Environment variables loaded successfully ✅\n", step)
+	stepper.increment()
 
 	if err := checkEnvVariables(); err != nil {
 		log.Fatalf("❌ Failed to check env variables: %v\n", err)
 	}
-	fmt.Print("2. Environment variables checked successfully ✅\n")
+	fmt.Printf("%d. Environment variables checked successfully ✅\n", step)
+	stepper.increment()
 
 	e.Use(middleware.RequestID())
 	e.Use(middleware.RequestLoggerWithConfig(config.LoggerConfigs))
@@ -61,9 +88,20 @@ func Setup() *echo.Echo {
 
 	router.RegisterRoutes(e) // register routes
 
-	if env := settings.Env; env == settings.EnvDevelopment {
+	// Add dev setup
+	if env == settings.EnvDevelopment {
 		addPprofRoutes(e) // add pprof routes for debugging
-		fmt.Println("3. Pprof routes added for debugging ✅")
+		fmt.Printf("%d. Pprof routes added for debugging ✅\n", step)
+		stepper.increment()
+
+	}
+
+	// Add not debug setup
+	if env != settings.EnvDevelopment {
+		sentry.AddSentryMiddleware(e) // add sentry
+		fmt.Printf("%d. Added Sentry middleware ✅\n", step)
+		stepper.increment()
+
 	}
 
 	return e

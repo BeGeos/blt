@@ -86,20 +86,19 @@ func Setup() *echo.Echo {
 	e.HTTPErrorHandler = handlers.ErrorHandler // custom error handler
 	e.Validator = &validators.RequestValidator{Validator: validator.New()}
 
+	// Add not debug setup
+	if env != settings.EnvDevelopment {
+		sentry.AddSentryMiddleware(e) // add sentry
+		fmt.Printf("%d. Added Sentry middleware ✅\n", step)
+		stepper.increment()
+	}
+
 	router.RegisterRoutes(e) // register routes
 
 	// Add dev setup
 	if env == settings.EnvDevelopment {
 		addPprofRoutes(e) // add pprof routes for debugging
 		fmt.Printf("%d. Pprof routes added for debugging ✅\n", step)
-		stepper.increment()
-
-	}
-
-	// Add not debug setup
-	if env != settings.EnvDevelopment {
-		sentry.AddSentryMiddleware(e) // add sentry
-		fmt.Printf("%d. Added Sentry middleware ✅\n", step)
 		stepper.increment()
 
 	}

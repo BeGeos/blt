@@ -16,7 +16,7 @@ func (h *_Handlers) Login(c echo.Context) error {
 	person := &schema.Person{}
 	user := person.New()
 
-	tokens, err := Services.GetValidTokens(user.UserID, user.Version)
+	tokens, err := Services.Token().GetValidTokens(user.UserID, user.Version)
 	if err != nil {
 		return err
 	}
@@ -45,7 +45,7 @@ func (h *_Handlers) Register(c echo.Context) error {
 	person := &schema.Person{}
 	user := person.New()
 
-	tokens, err := Services.GetValidTokens(user.UserID, user.Version)
+	tokens, err := Services.Token().GetValidTokens(user.UserID, user.Version)
 	if err != nil {
 		return err
 	}
@@ -66,7 +66,7 @@ func (h *_Handlers) Me(c echo.Context) error {
 func (h *_Handlers) Refresh(c echo.Context) error {
 	person, _ := c.Get("person").(schema.PersonSchema) // add casting when person model is defined
 
-	token, err := Services.RefreshToken(person.UserID)
+	token, err := Services.Token().RefreshToken(person.UserID)
 	if err != nil {
 		return err
 	}

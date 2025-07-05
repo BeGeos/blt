@@ -8,8 +8,14 @@ import (
 
 type _Services struct{}
 
+func (s *_Services) Token() *_AuthTokenService {
+	return &_AuthTokenService{}
+}
+
+type _AuthTokenService struct{}
+
 // TODO: pass args for the claims
-func (s *_Services) GetValidTokens(userID, version uint) (Tokens, error) {
+func (s *_AuthTokenService) GetValidTokens(userID, version uint) (Tokens, error) {
 	type ResultCh struct {
 		token string
 		err   error
@@ -48,7 +54,7 @@ func (s *_Services) GetValidTokens(userID, version uint) (Tokens, error) {
 	}, nil
 }
 
-func (s *_Services) RefreshToken(userID uint) (string, error) {
+func (s *_AuthTokenService) RefreshToken(userID uint) (string, error) {
 	claims := jwt.AccessTokenClaims{
 		UserID: userID,
 	}

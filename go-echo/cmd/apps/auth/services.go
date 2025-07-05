@@ -9,20 +9,19 @@ import (
 )
 
 type (
+	Token interface {
+		GetValidTokens(userID, version uint) (Tokens, error)
+		GetNewAccessToken(userID uint) (string, error)
+	}
 	Services struct {
 		JwtServices *appjwt.Services
+		Token       Token
 	}
 	_AuthTokenService struct {
 		JwtServices *appjwt.Services
 	}
 	_PasswordService struct{}
 )
-
-func (s *Services) Token() *_AuthTokenService {
-	return &_AuthTokenService{
-		JwtServices: s.JwtServices,
-	}
-}
 
 // TODO: pass args for the claims
 func (s *_AuthTokenService) GetValidTokens(userID, version uint) (Tokens, error) {
@@ -38,7 +37,7 @@ func (s *_AuthTokenService) GetValidTokens(userID, version uint) (Tokens, error)
 		claims := jwt.AccessTokenClaims{
 			UserID: userID,
 		}
-		token, err := s.JwtServices.Token().New(claims, jwt.NewArgs{Kind: "access"})
+		token, err := s.JwtServices.Token.New(claims, jwt.NewArgs{Kind: "access"})
 		ch <- ResultCh{token: token, err: err}
 	}(accessCh)
 
@@ -47,7 +46,7 @@ func (s *_AuthTokenService) GetValidTokens(userID, version uint) (Tokens, error)
 			UserID:  userID,
 			Version: version, // replace with actual version check logic
 		}
-		token, err := s.JwtServices.Token().New(claims, jwt.NewArgs{Kind: "refresh"})
+		token, err := s.JwtServices.Token.New(claims, jwt.NewArgs{Kind: "refresh"})
 		ch <- ResultCh{token: token, err: err}
 	}(refreshCh)
 
@@ -69,7 +68,7 @@ func (s *_AuthTokenService) GetNewAccessToken(userID uint) (string, error) {
 		UserID: userID,
 	}
 
-	token, err := s.JwtServices.Token().New(claims, jwt.NewArgs{Kind: "access"})
+	token, err := s.JwtServices.Token.New(claims, jwt.NewArgs{Kind: "access"})
 	if err != nil {
 		return "", errors.New("failed to create token")
 	}
@@ -80,9 +79,21 @@ func (s *_AuthTokenService) GetNewAccessToken(userID uint) (string, error) {
 type ServicesArgs struct {
 	JwtServices *appjwt.Services
 }
+type newAuthTokenServiceArgs struct {
+	JwtServices *appjwt.Services
+}
+
+func newAuthTokenService(args newAuthTokenServiceArgs) Token {
+	return &_AuthTokenService{
+		JwtServices: args.JwtServices,
+	}
+}
 
 func NewServices(args ServicesArgs) *Services {
 	return &Services{
 		JwtServices: args.JwtServices,
+		Token: newAuthTokenService(newAuthTokenServiceArgs{
+			JwtServices: args.JwtServices,
+		}),
 	}
 }

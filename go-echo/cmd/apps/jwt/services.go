@@ -8,21 +8,22 @@ import (
 )
 
 type (
-	Services struct{}
-	_Token   struct{}
+	Token interface {
+		New(claims interface{}, args NewArgs) (string, error)
+	}
+	token    struct{}
+	Services struct {
+		Token Token
+	}
 )
 
 var jwtSecret = []byte(settings.JwtSecretKey)
-
-func (s *Services) Token() *_Token {
-	return &_Token{}
-}
 
 type NewArgs struct {
 	Kind string
 }
 
-func (s *_Token) New(claims interface{}, args NewArgs) (string, error) {
+func (s *token) New(claims interface{}, args NewArgs) (string, error) {
 	switch args.Kind {
 	case "access":
 		claims, _ := claims.(AccessTokenClaims)
@@ -35,7 +36,7 @@ func (s *_Token) New(claims interface{}, args NewArgs) (string, error) {
 	return "", jwt.ErrInvalidKeyType
 }
 
-func (s *_Token) newAccessToken(c AccessTokenClaims) (string, error) {
+func (s *token) newAccessToken(c AccessTokenClaims) (string, error) {
 	claims := &JwtClaims{
 		AccessTokenClaims: AccessTokenClaims{
 			UserID: c.UserID,
@@ -50,7 +51,7 @@ func (s *_Token) newAccessToken(c AccessTokenClaims) (string, error) {
 	return token.SignedString(jwtSecret)
 }
 
-func (s *_Token) newRefreshToken(c RefreshTokenClaims) (string, error) {
+func (s *token) newRefreshToken(c RefreshTokenClaims) (string, error) {
 	claims := &RefreshJwtClaims{
 		RefreshTokenClaims: RefreshTokenClaims{
 			UserID:  c.UserID,
@@ -66,6 +67,12 @@ func (s *_Token) newRefreshToken(c RefreshTokenClaims) (string, error) {
 	return token.SignedString(jwtSecret)
 }
 
+func newTokenService() Token {
+	return &token{}
+}
+
 func NewServices() *Services {
-	return &Services{}
+	return &Services{
+		Token: newTokenService(),
+	}
 }

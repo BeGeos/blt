@@ -64,8 +64,6 @@ func (h *AuthHandler) Me(c echo.Context) error {
 	person := &schema.Person{}
 	user := person.New()
 
-	panic("this one comes with request id")
-
 	return c.JSON(http.StatusOK, user)
 }
 

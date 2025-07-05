@@ -15,7 +15,12 @@ type AuthHandler struct {
 }
 
 func (h *AuthHandler) Login(c echo.Context) error {
-	tokens, err := h.Auth.GetValidTokens()
+	// TODO: fetch person by email and check password
+
+	person := &schema.Person{}
+	user := person.New()
+
+	tokens, err := h.Auth.GetValidTokens(user.UserID, user.Version)
 	if err != nil {
 		return err
 	}
@@ -27,7 +32,6 @@ func (h *AuthHandler) Login(c echo.Context) error {
 }
 
 func (h *AuthHandler) Logout(c echo.Context) error {
-	// increment user token version or invalidate the token
 	return c.JSON(http.StatusNoContent, map[string]string{})
 }
 
@@ -42,8 +46,10 @@ func (h *AuthHandler) Register(c echo.Context) error {
 	}
 
 	// TODO: add logic to register the user, e.g., save to database
+	person := &schema.Person{}
+	user := person.New()
 
-	tokens, err := h.Auth.GetValidTokens()
+	tokens, err := h.Auth.GetValidTokens(user.UserID, user.Version)
 	if err != nil {
 		return err
 	}
@@ -55,19 +61,18 @@ func (h *AuthHandler) Register(c echo.Context) error {
 }
 
 func (h *AuthHandler) Me(c echo.Context) error {
-	person := &schema.SelfResponse{
-		UserID:    1,
-		FirstName: "John",
-		LastName:  "Doe",
-		Age:       30,
-	}
-	return c.JSON(http.StatusOK, person)
+	person := &schema.Person{}
+	user := person.New()
+
+	panic("this one comes with request id")
+
+	return c.JSON(http.StatusOK, user)
 }
 
 func (h *AuthHandler) Refresh(c echo.Context) error {
-	person, _ := c.Get("person").(uint) // add casting when person model is defined
+	person, _ := c.Get("person").(schema.PersonSchema) // add casting when person model is defined
 
-	token, err := h.Auth.RefreshToken(person)
+	token, err := h.Auth.RefreshToken(person.UserID)
 	if err != nil {
 		return err
 	}

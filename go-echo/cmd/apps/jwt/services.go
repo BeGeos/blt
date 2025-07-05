@@ -11,27 +11,6 @@ type _Services struct{}
 
 var jwtSecret = []byte(settings.JwtSecretKey)
 
-type AccessTokenClaims struct {
-	UserID uint `json:"user_id"`
-}
-
-type RefreshTokenClaims struct {
-	UserID  uint `json:"user_id"`
-	Version uint `json:"version"`
-}
-
-type JwtClaims struct {
-	AccessTokenClaims
-	jwt.RegisteredClaims
-}
-
-type RefreshJwtClaims struct {
-	RefreshTokenClaims
-	jwt.RegisteredClaims
-}
-
-type JwtService struct{}
-
 func (s *_Services) NewAccessToken(c AccessTokenClaims) (string, error) {
 	claims := &JwtClaims{
 		AccessTokenClaims: AccessTokenClaims{

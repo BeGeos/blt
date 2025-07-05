@@ -13,7 +13,6 @@ import (
 	"github.com/labstack/echo/v4/middleware"
 
 	"github.com/BeGeos/go-echo/internal/config"
-	"github.com/BeGeos/go-echo/internal/handlers"
 	"github.com/BeGeos/go-echo/internal/settings"
 	"github.com/BeGeos/go-echo/pkg/sentry"
 )
@@ -80,8 +79,8 @@ func Setup() *echo.Echo {
 		Timeout: 30 * time.Second, // 30 seconds timeout
 	}))
 
-	e.HTTPErrorHandler = handlers.ErrorHandler // custom error handler
-	e.Validator = Validators.Request           // custom request validator
+	e.HTTPErrorHandler = ErrorHandler // custom error handler
+	e.Validator = Validators.Request  // custom request validator
 
 	// Add not debug setup
 	if env != settings.EnvDevelopment {

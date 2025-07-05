@@ -8,11 +8,11 @@ import (
 	appjwt "github.com/BeGeos/go-echo/cmd/apps/jwt"
 )
 
+type Token interface {
+	GetValidTokens(userID, version uint) (Tokens, error)
+	GetNewAccessToken(userID uint) (string, error)
+}
 type (
-	Token interface {
-		GetValidTokens(userID, version uint) (Tokens, error)
-		GetNewAccessToken(userID uint) (string, error)
-	}
 	Services struct {
 		JwtServices *appjwt.Services
 		Token       Token

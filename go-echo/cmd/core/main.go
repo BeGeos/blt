@@ -19,7 +19,8 @@ type _App struct{}
 
 func (a *_App) Setup() *echo.Echo {
 	env, step := settings.Env, 1
-	stepper := Utils.Stepper(&step)
+	utils := NewUtils()
+	stepper := utils.Stepper(&step)
 
 	fmt.Println("Setting up...")
 
@@ -40,7 +41,7 @@ func (a *_App) Setup() *echo.Echo {
 	fmt.Printf("%d. Environment variables loaded successfully ✅\n", step)
 	stepper.increment()
 
-	if err := Utils.CheckEnvVariables(); err != nil {
+	if err := utils.CheckEnvVariables(); err != nil {
 		log.Fatalf("❌ Failed to check env variables: %v\n", err)
 	}
 	fmt.Printf("%d. Environment variables checked successfully ✅\n", step)

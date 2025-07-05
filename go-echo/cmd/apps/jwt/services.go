@@ -7,10 +7,10 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 )
 
+type Token interface {
+	New(claims interface{}, args NewArgs) (string, error)
+}
 type (
-	Token interface {
-		New(claims interface{}, args NewArgs) (string, error)
-	}
 	token    struct{}
 	Services struct {
 		Token Token

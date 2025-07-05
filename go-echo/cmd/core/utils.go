@@ -1,6 +1,10 @@
 package core
 
-type _Utils struct{}
+type Utils interface {
+	Stepper(start *int) stepper
+	CheckEnvVariables() error
+}
+type utils struct{}
 
 type stepper struct {
 	start *int
@@ -14,13 +18,15 @@ func (s *stepper) decrement() {
 	*s.start--
 }
 
-func (u *_Utils) CheckEnvVariables() error {
+func (u *utils) CheckEnvVariables() error {
 	// these are the variables that must be set in the environment
 	return nil
 }
 
-func (u *_Utils) Stepper(start *int) stepper {
+func (u *utils) Stepper(start *int) stepper {
 	return stepper{start: start}
 }
 
-var Utils = &_Utils{}
+func NewUtils() Utils {
+	return &utils{}
+}

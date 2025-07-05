@@ -11,9 +11,7 @@ import (
 	"github.com/BeGeos/go-echo/internal/schema"
 )
 
-type _Middlewares struct{}
-
-func (m *_Middlewares) Authenticated(next echo.HandlerFunc) echo.HandlerFunc {
+func Authenticated(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		person, ok := c.Get("person").(schema.PersonSchema)
 
@@ -35,7 +33,7 @@ func (m *_Middlewares) Authenticated(next echo.HandlerFunc) echo.HandlerFunc {
 	}
 }
 
-func (m *_Middlewares) NotAuthenticated(next echo.HandlerFunc) echo.HandlerFunc {
+func NotAuthenticated(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		person := c.Get("person")
 
@@ -45,5 +43,3 @@ func (m *_Middlewares) NotAuthenticated(next echo.HandlerFunc) echo.HandlerFunc 
 		return next(c)
 	}
 }
-
-var Middlewares = &_Middlewares{}

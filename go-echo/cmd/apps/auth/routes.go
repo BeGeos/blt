@@ -9,16 +9,14 @@ import (
 	"github.com/BeGeos/go-echo/internal/config"
 )
 
-type _Routes struct{}
-
-func (r *_Routes) Register(e *echo.Echo) {
+func RegisterAuthRoutes(e *echo.Echo) {
 	handlers := NewHandlers(NewServices(ServicesArgs{
 		JwtServices: appjwt.NewServices(),
 	}))
 	g := e.Group("/auth") // limited to 5 requests per minute
 
 	// requires authentication
-	authenticated := g.Group("", echojwt.WithConfig(Config.JwtAuthenticatedConfig), Middlewares.Authenticated)
+	authenticated := g.Group("", echojwt.WithConfig(Config.JwtAuthenticatedConfig), Authenticated)
 
 	authenticated.GET("/me", handlers.Me).Name = "auth:me"
 	authenticated.POST("/logout", handlers.Logout).Name = "auth:logout"
@@ -28,7 +26,7 @@ func (r *_Routes) Register(e *echo.Echo) {
 		"",
 		middleware.RateLimiterWithConfig(config.GetAuthenticationRateLimiterConfig()),
 		echojwt.WithConfig(Config.JwtMaybeAuthenticatedConfig),
-		Middlewares.NotAuthenticated,
+		NotAuthenticated,
 	)
 
 	notAuthenticated.POST("/login", handlers.Login).Name = "auth:login"
@@ -39,9 +37,7 @@ func (r *_Routes) Register(e *echo.Echo) {
 	maybeAuthenticated := g.Group(
 		"",
 		middleware.RateLimiterWithConfig(config.GetAuthenticationRateLimiterConfig()),
-		appjwt.Middlewares.ValidateRefreshToken,
+		appjwt.ValidateRefreshToken,
 	) // one-handler group for documentation purposes
 	maybeAuthenticated.POST("/refresh", handlers.Refresh).Name = "auth:refresh"
 }
-
-var Routes = &_Routes{}

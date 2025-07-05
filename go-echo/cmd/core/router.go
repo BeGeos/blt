@@ -9,24 +9,19 @@ import (
 	"github.com/BeGeos/go-echo/cmd/apps/auth"
 )
 
-type _Router struct{}
-
-func (r *_Router) registerRootRoutes(e *echo.Echo) {
-	handlers := NewHandlers()
-	e.GET("/", handlers.RootHandler).Name = "home"
-	e.GET("/ping", handlers.HealthCheckHandler).Name = "ping"
+func RegisterRootRoutes(e *echo.Echo) {
+	e.GET("/", RootHandler).Name = "home"
+	e.GET("/ping", HealthCheckHandler).Name = "ping"
 }
 
-func (r *_Router) RegisterPprofRoutes(e *echo.Echo) {
+func RegisterPprofRoutes(e *echo.Echo) {
 	e.GET("/debug/*", echo.WrapHandler(http.DefaultServeMux))
 }
 
-func (r *_Router) Register(e *echo.Echo) {
+func RegisterRoutes(e *echo.Echo) {
 	// Register your routes here
-	r.registerRootRoutes(e)
+	RegisterRootRoutes(e)
 
 	// 2.0
-	auth.Routes.Register(e)
+	auth.RegisterAuthRoutes(e)
 }
-
-var Router = &_Router{}

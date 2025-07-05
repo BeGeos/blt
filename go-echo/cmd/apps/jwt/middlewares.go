@@ -8,8 +8,6 @@ import (
 	"github.com/BeGeos/go-echo/internal/settings"
 )
 
-type _Middlewares struct{}
-
 // Validation happens in 4 steps:
 //   - validate the request body => !ok return 401
 //   - validate the token => !ok return 401
@@ -17,7 +15,7 @@ type _Middlewares struct{}
 //   - validate the person version => !ok return 401
 //
 // If everything is ok, set the person in the context and call next handler
-func (m *_Middlewares) ValidateRefreshToken(next echo.HandlerFunc) echo.HandlerFunc {
+func ValidateRefreshToken(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		var req RefreshTokenRequestDto
 		if err := c.Bind(&req); err != nil {
@@ -56,5 +54,3 @@ func (m *_Middlewares) ValidateRefreshToken(next echo.HandlerFunc) echo.HandlerF
 		return next(c)
 	}
 }
-
-var Middlewares = &_Middlewares{}

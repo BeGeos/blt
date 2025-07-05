@@ -1,10 +1,8 @@
-package app
+package core
 
 import (
 	"fmt"
 	"log"
-	"net/http"
-	_ "net/http/pprof"
 	"time"
 
 	"golang.org/x/time/rate"
@@ -17,30 +15,11 @@ import (
 	"github.com/BeGeos/go-echo/pkg/sentry"
 )
 
-func checkEnvVariables() error {
-	// these are the variables that must be set in the environment
-	return nil
-}
+type _App struct{}
 
-func addPprofRoutes(e *echo.Echo) {
-	e.GET("/debug/*", echo.WrapHandler(http.DefaultServeMux))
-}
-
-type Stepper struct {
-	start *int
-}
-
-func (s *Stepper) increment() {
-	*s.start++
-}
-
-func (s *Stepper) decrement() {
-	*s.start--
-}
-
-func Setup() *echo.Echo {
+func (a *_App) Setup() *echo.Echo {
 	env, step := settings.Env, 1
-	stepper := &Stepper{start: &step}
+	stepper := Utils.Stepper(&step)
 
 	fmt.Println("Setting up...")
 
@@ -61,7 +40,7 @@ func Setup() *echo.Echo {
 	fmt.Printf("%d. Environment variables loaded successfully ✅\n", step)
 	stepper.increment()
 
-	if err := checkEnvVariables(); err != nil {
+	if err := Utils.CheckEnvVariables(); err != nil {
 		log.Fatalf("❌ Failed to check env variables: %v\n", err)
 	}
 	fmt.Printf("%d. Environment variables checked successfully ✅\n", step)
@@ -93,7 +72,7 @@ func Setup() *echo.Echo {
 
 	// Add dev setup
 	if env == settings.EnvDevelopment {
-		addPprofRoutes(e) // add pprof routes for debugging
+		Router.RegisterPprofRoutes(e) // add pprof routes for debugging
 		fmt.Printf("%d. Pprof routes added for debugging ✅\n", step)
 		stepper.increment()
 
@@ -101,3 +80,5 @@ func Setup() *echo.Echo {
 
 	return e
 }
+
+var App = &_App{}

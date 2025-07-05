@@ -3,3 +3,7 @@ bin/*
 
 *.log
 tmp/
+
+.env 
+.env.local 
+.env.staging

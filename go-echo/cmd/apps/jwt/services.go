@@ -7,11 +7,35 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 )
 
-type _Services struct{}
+type (
+	_Services struct{}
+	_Token    struct{}
+)
 
 var jwtSecret = []byte(settings.JwtSecretKey)
 
-func (s *_Services) NewAccessToken(c AccessTokenClaims) (string, error) {
+func (s *_Services) Token() *_Token {
+	return &_Token{}
+}
+
+type NewArgs struct {
+	Kind string
+}
+
+func (s *_Token) New(claims interface{}, args NewArgs) (string, error) {
+	switch args.Kind {
+	case "access":
+		claims, _ := claims.(AccessTokenClaims)
+		return s.newAccessToken(claims)
+	case "refresh":
+		claims, _ := claims.(RefreshTokenClaims)
+		return s.newRefreshToken(claims)
+	}
+
+	return "", jwt.ErrInvalidKeyType
+}
+
+func (s *_Token) newAccessToken(c AccessTokenClaims) (string, error) {
 	claims := &JwtClaims{
 		AccessTokenClaims: AccessTokenClaims{
 			UserID: c.UserID,
@@ -26,7 +50,7 @@ func (s *_Services) NewAccessToken(c AccessTokenClaims) (string, error) {
 	return token.SignedString(jwtSecret)
 }
 
-func (s *_Services) NewRefreshToken(c RefreshTokenClaims) (string, error) {
+func (s *_Token) newRefreshToken(c RefreshTokenClaims) (string, error) {
 	claims := &RefreshJwtClaims{
 		RefreshTokenClaims: RefreshTokenClaims{
 			UserID:  c.UserID,

@@ -66,7 +66,7 @@ func (h *_Handlers) Me(c echo.Context) error {
 func (h *_Handlers) Refresh(c echo.Context) error {
 	person, _ := c.Get("person").(schema.PersonSchema) // add casting when person model is defined
 
-	token, err := Services.Token().RefreshToken(person.UserID)
+	token, err := Services.Token().GetNewAccessToken(person.UserID)
 	if err != nil {
 		return err
 	}

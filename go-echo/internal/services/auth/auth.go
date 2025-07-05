@@ -12,7 +12,7 @@ type Tokens struct {
 }
 
 // TODO: pass args for the claims
-func (s *AuthService) GetValidTokens() (Tokens, error) {
+func (s *AuthService) GetValidTokens(userID, version uint) (Tokens, error) {
 	jwt := &JwtService{}
 
 	type ResultCh struct {
@@ -25,7 +25,7 @@ func (s *AuthService) GetValidTokens() (Tokens, error) {
 
 	go func(ch chan ResultCh) {
 		claims := AccessTokenClaims{
-			UserID: 1,
+			UserID: userID,
 		}
 		token, err := jwt.NewAccessToken(claims)
 		ch <- ResultCh{token: token, err: err}
@@ -33,8 +33,8 @@ func (s *AuthService) GetValidTokens() (Tokens, error) {
 
 	go func(ch chan ResultCh) {
 		claims := RefreshTokenClaims{
-			UserID:  1,
-			Version: 1, // replace with actual version check logic
+			UserID:  userID,
+			Version: version, // replace with actual version check logic
 		}
 		token, err := jwt.NewRefreshToken(claims)
 		ch <- ResultCh{token: token, err: err}
@@ -56,9 +56,8 @@ func (s *AuthService) GetValidTokens() (Tokens, error) {
 func (s *AuthService) RefreshToken(userID uint) (string, error) {
 	jwt := &JwtService{}
 
-	const version = 1 // replace with actual version check logic when person
 	claims := AccessTokenClaims{
-		UserID: 1,
+		UserID: userID,
 	}
 
 	token, err := jwt.NewAccessToken(claims)

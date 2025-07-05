@@ -1,9 +1,15 @@
 package middlewares
 
 import (
+	"strconv"
+
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/labstack/echo/v4"
 
+	"github.com/getsentry/sentry-go"
+	sentryecho "github.com/getsentry/sentry-go/echo"
+
+	"github.com/BeGeos/go-echo/internal/schema"
 	auth_services "github.com/BeGeos/go-echo/internal/services/auth"
 	"github.com/BeGeos/go-echo/internal/settings"
 )
@@ -45,25 +51,38 @@ func ValidateRefreshToken(next echo.HandlerFunc) echo.HandlerFunc {
 			return echo.ErrUnauthorized
 		}
 
-		userID := claims.UserID   // use this to fetch person from database
 		version := claims.Version // use this to compare person version
 
 		if version != 1 { // replace with actual version check logic
 			return echo.ErrUnauthorized
 		}
 
-		c.Set("person", userID) // Set the person in the context
+		person := &schema.Person{}
+		user := person.New()
+
+		c.Set("person", user) // Set the person in the context
 		return next(c)
 	}
 }
 
 func Authenticated(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
-		person := c.Get("person")
+		person, ok := c.Get("person").(schema.PersonSchema)
 
-		if person == nil {
+		if !ok {
 			return echo.ErrUnauthorized
 		}
+
+		if hub := sentryecho.GetHubFromContext(c); hub != nil {
+			hub.ConfigureScope(func(scope *sentry.Scope) {
+				scope.SetUser(sentry.User{
+					ID:        strconv.Itoa(int(person.UserID)),
+					Email:     person.Email,
+					IPAddress: c.RealIP(),
+				})
+			})
+		}
+
 		return next(c)
 	}
 }

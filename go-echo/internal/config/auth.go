@@ -1,10 +1,13 @@
 package config
 
 import (
+	"log"
+
 	"github.com/golang-jwt/jwt/v5"
 	echojwt "github.com/labstack/echo-jwt/v4"
 	"github.com/labstack/echo/v4"
 
+	"github.com/BeGeos/go-echo/internal/schema"
 	auth_services "github.com/BeGeos/go-echo/internal/services/auth"
 	"github.com/BeGeos/go-echo/internal/settings"
 )
@@ -16,14 +19,17 @@ type Args struct {
 }
 
 func successHandler(c echo.Context) {
+	person := &schema.Person{}
+	user := person.New()
+
 	token, ok := c.Get(contextKey).(*jwt.Token)
 	if ok {
 		claims, _ := token.Claims.(*auth_services.JwtClaims)
 
-		person := claims.UserID
-
 		// fetch person from database and put into context
-		c.Set("person", person)
+		// TODO: remove this print
+		log.Printf("the user %d has been successfully verified", claims.UserID)
+		c.Set("person", user)
 	}
 }
 

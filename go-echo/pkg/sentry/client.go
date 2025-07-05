@@ -22,20 +22,22 @@ func GetSentryClientOptions(env string) sentry.ClientOptions {
 
 func getProductionClientOptions() sentry.ClientOptions {
 	return sentry.ClientOptions{
-		Dsn:              settings.SentryDsn,
 		Debug:            true,
 		AttachStacktrace: true,
+		EnableTracing:    true,
+		SendDefaultPII:   true,
 		TracesSampleRate: 0.3,
+		Dsn:              settings.SentryDsn,
 		Environment:      settings.EnvProduction,
 	}
 }
 
 func getStagingClientOptions() sentry.ClientOptions {
 	return sentry.ClientOptions{
-		Dsn:              settings.SentryDsn,
 		Debug:            true,
 		AttachStacktrace: true,
 		TracesSampleRate: 0.8,
+		Dsn:              settings.SentryDsn,
 		Environment:      settings.EnvStaging,
 	}
 }

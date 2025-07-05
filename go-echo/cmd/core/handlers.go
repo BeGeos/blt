@@ -19,4 +19,6 @@ func (h *_Handlers) HealthCheckHandler(c echo.Context) error {
 	return c.String(http.StatusOK, "pong")
 }
 
-var Handlers = &_Handlers{}
+func NewHandlers() *_Handlers {
+	return &_Handlers{}
+}

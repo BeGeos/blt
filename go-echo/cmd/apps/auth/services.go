@@ -4,16 +4,24 @@ import (
 	"errors"
 
 	"github.com/BeGeos/go-echo/cmd/apps/jwt"
+
+	appjwt "github.com/BeGeos/go-echo/cmd/apps/jwt"
 )
 
 type (
-	_Services         struct{}
-	_AuthTokenService struct{}
-	_PasswordService  struct{}
+	Services struct {
+		JwtServices *appjwt.Services
+	}
+	_AuthTokenService struct {
+		JwtServices *appjwt.Services
+	}
+	_PasswordService struct{}
 )
 
-func (s *_Services) Token() *_AuthTokenService {
-	return &_AuthTokenService{}
+func (s *Services) Token() *_AuthTokenService {
+	return &_AuthTokenService{
+		JwtServices: s.JwtServices,
+	}
 }
 
 // TODO: pass args for the claims
@@ -30,7 +38,7 @@ func (s *_AuthTokenService) GetValidTokens(userID, version uint) (Tokens, error)
 		claims := jwt.AccessTokenClaims{
 			UserID: userID,
 		}
-		token, err := jwt.Services.Token().New(claims, jwt.NewArgs{Kind: "access"})
+		token, err := s.JwtServices.Token().New(claims, jwt.NewArgs{Kind: "access"})
 		ch <- ResultCh{token: token, err: err}
 	}(accessCh)
 
@@ -39,7 +47,7 @@ func (s *_AuthTokenService) GetValidTokens(userID, version uint) (Tokens, error)
 			UserID:  userID,
 			Version: version, // replace with actual version check logic
 		}
-		token, err := jwt.Services.Token().New(claims, jwt.NewArgs{Kind: "refresh"})
+		token, err := s.JwtServices.Token().New(claims, jwt.NewArgs{Kind: "refresh"})
 		ch <- ResultCh{token: token, err: err}
 	}(refreshCh)
 
@@ -61,7 +69,7 @@ func (s *_AuthTokenService) GetNewAccessToken(userID uint) (string, error) {
 		UserID: userID,
 	}
 
-	token, err := jwt.Services.Token().New(claims, jwt.NewArgs{Kind: "access"})
+	token, err := s.JwtServices.Token().New(claims, jwt.NewArgs{Kind: "access"})
 	if err != nil {
 		return "", errors.New("failed to create token")
 	}
@@ -69,4 +77,12 @@ func (s *_AuthTokenService) GetNewAccessToken(userID uint) (string, error) {
 	return token, nil
 }
 
-var Services = &_Services{}
+type ServicesArgs struct {
+	JwtServices *appjwt.Services
+}
+
+func NewServices(args ServicesArgs) *Services {
+	return &Services{
+		JwtServices: args.JwtServices,
+	}
+}

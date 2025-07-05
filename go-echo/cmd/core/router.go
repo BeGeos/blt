@@ -12,8 +12,9 @@ import (
 type _Router struct{}
 
 func (r *_Router) registerRootRoutes(e *echo.Echo) {
-	e.GET("/", Handlers.RootHandler).Name = "home"
-	e.GET("/ping", Handlers.HealthCheckHandler).Name = "ping"
+	handlers := NewHandlers()
+	e.GET("/", handlers.RootHandler).Name = "home"
+	e.GET("/ping", handlers.HealthCheckHandler).Name = "ping"
 }
 
 func (r *_Router) RegisterPprofRoutes(e *echo.Echo) {

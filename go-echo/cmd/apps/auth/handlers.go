@@ -8,7 +8,9 @@ import (
 	"github.com/BeGeos/go-echo/internal/schema"
 )
 
-type _Handlers struct{}
+type _Handlers struct {
+	services *Services
+}
 
 func (h *_Handlers) Login(c echo.Context) error {
 	// TODO: fetch person by email and check password
@@ -16,7 +18,7 @@ func (h *_Handlers) Login(c echo.Context) error {
 	person := &schema.Person{}
 	user := person.New()
 
-	tokens, err := Services.Token().GetValidTokens(user.UserID, user.Version)
+	tokens, err := h.services.Token().GetValidTokens(user.UserID, user.Version)
 	if err != nil {
 		return err
 	}
@@ -45,7 +47,7 @@ func (h *_Handlers) Register(c echo.Context) error {
 	person := &schema.Person{}
 	user := person.New()
 
-	tokens, err := Services.Token().GetValidTokens(user.UserID, user.Version)
+	tokens, err := h.services.Token().GetValidTokens(user.UserID, user.Version)
 	if err != nil {
 		return err
 	}
@@ -66,7 +68,7 @@ func (h *_Handlers) Me(c echo.Context) error {
 func (h *_Handlers) Refresh(c echo.Context) error {
 	person, _ := c.Get("person").(schema.PersonSchema) // add casting when person model is defined
 
-	token, err := Services.Token().GetNewAccessToken(person.UserID)
+	token, err := h.services.Token().GetNewAccessToken(person.UserID)
 	if err != nil {
 		return err
 	}
@@ -103,4 +105,8 @@ func (h *_Handlers) ResetPassword(c echo.Context) error {
 	return c.JSON(http.StatusNoContent, Schemas.Response().Empty())
 }
 
-var Handlers = &_Handlers{}
+func NewHandlers(s *Services) *_Handlers {
+	return &_Handlers{
+		services: s,
+	}
+}

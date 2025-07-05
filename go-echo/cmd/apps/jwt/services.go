@@ -8,13 +8,13 @@ import (
 )
 
 type (
-	_Services struct{}
-	_Token    struct{}
+	Services struct{}
+	_Token   struct{}
 )
 
 var jwtSecret = []byte(settings.JwtSecretKey)
 
-func (s *_Services) Token() *_Token {
+func (s *Services) Token() *_Token {
 	return &_Token{}
 }
 
@@ -66,4 +66,6 @@ func (s *_Token) newRefreshToken(c RefreshTokenClaims) (string, error) {
 	return token.SignedString(jwtSecret)
 }
 
-var Services = &_Services{}
+func NewServices() *Services {
+	return &Services{}
+}

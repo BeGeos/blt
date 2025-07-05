@@ -1,4 +1,4 @@
-package config
+package auth
 
 import (
 	"log"
@@ -8,9 +8,15 @@ import (
 	"github.com/labstack/echo/v4"
 
 	"github.com/BeGeos/go-echo/internal/schema"
-	auth_services "github.com/BeGeos/go-echo/internal/services/auth"
 	"github.com/BeGeos/go-echo/internal/settings"
+
+	appjwt "github.com/BeGeos/go-echo/cmd/apps/jwt"
 )
+
+type _Config struct {
+	JwtAuthenticatedConfig      echojwt.Config
+	JwtMaybeAuthenticatedConfig echojwt.Config
+}
 
 var contextKey = settings.JwtContextKey
 
@@ -24,7 +30,7 @@ func successHandler(c echo.Context) {
 
 	token, ok := c.Get(contextKey).(*jwt.Token)
 	if ok {
-		claims, _ := token.Claims.(*auth_services.JwtClaims)
+		claims, _ := token.Claims.(*appjwt.JwtClaims)
 
 		// fetch person from database and put into context
 		// TODO: remove this print
@@ -34,7 +40,7 @@ func successHandler(c echo.Context) {
 }
 
 func newClaimsFunc(c echo.Context) jwt.Claims {
-	return new(auth_services.JwtClaims)
+	return new(appjwt.JwtClaims)
 }
 
 func getJwtConfig(args Args) echojwt.Config {
@@ -51,6 +57,11 @@ func getJwtConfig(args Args) echojwt.Config {
 }
 
 var (
-	JwtAuthenticatedConfig      = getJwtConfig(Args{authenticationRequired: true})
-	JwtMaybeAuthenticatedConfig = getJwtConfig(Args{authenticationRequired: false})
+	jwtAuthenticatedConfig      = getJwtConfig(Args{authenticationRequired: true})
+	jwtMaybeAuthenticatedConfig = getJwtConfig(Args{authenticationRequired: false})
 )
+
+var Config = &_Config{
+	JwtAuthenticatedConfig:      jwtAuthenticatedConfig,
+	JwtMaybeAuthenticatedConfig: jwtMaybeAuthenticatedConfig,
+}

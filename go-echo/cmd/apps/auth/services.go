@@ -1,20 +1,15 @@
-package services
+package auth
 
 import (
 	"errors"
+
+	"github.com/BeGeos/go-echo/cmd/apps/jwt"
 )
 
-type AuthService struct{}
-
-type Tokens struct {
-	AccessToken  string
-	RefreshToken string
-}
+type _Services struct{}
 
 // TODO: pass args for the claims
-func (s *AuthService) GetValidTokens(userID, version uint) (Tokens, error) {
-	jwt := &JwtService{}
-
+func (s *_Services) GetValidTokens(userID, version uint) (Tokens, error) {
 	type ResultCh struct {
 		token string
 		err   error
@@ -24,19 +19,19 @@ func (s *AuthService) GetValidTokens(userID, version uint) (Tokens, error) {
 	refreshCh := make(chan ResultCh)
 
 	go func(ch chan ResultCh) {
-		claims := AccessTokenClaims{
+		claims := jwt.AccessTokenClaims{
 			UserID: userID,
 		}
-		token, err := jwt.NewAccessToken(claims)
+		token, err := jwt.Services.NewAccessToken(claims)
 		ch <- ResultCh{token: token, err: err}
 	}(accessCh)
 
 	go func(ch chan ResultCh) {
-		claims := RefreshTokenClaims{
+		claims := jwt.RefreshTokenClaims{
 			UserID:  userID,
 			Version: version, // replace with actual version check logic
 		}
-		token, err := jwt.NewRefreshToken(claims)
+		token, err := jwt.Services.NewRefreshToken(claims)
 		ch <- ResultCh{token: token, err: err}
 	}(refreshCh)
 
@@ -53,17 +48,17 @@ func (s *AuthService) GetValidTokens(userID, version uint) (Tokens, error) {
 	}, nil
 }
 
-func (s *AuthService) RefreshToken(userID uint) (string, error) {
-	jwt := &JwtService{}
-
-	claims := AccessTokenClaims{
+func (s *_Services) RefreshToken(userID uint) (string, error) {
+	claims := jwt.AccessTokenClaims{
 		UserID: userID,
 	}
 
-	token, err := jwt.NewAccessToken(claims)
+	token, err := jwt.Services.NewAccessToken(claims)
 	if err != nil {
 		return "", errors.New("failed to create token")
 	}
 
 	return token, nil
 }
+
+var Services = &_Services{}

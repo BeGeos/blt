@@ -93,7 +93,7 @@ func Setup() *echo.Echo {
 		stepper.increment()
 	}
 
-	router.RegisterRoutes(e) // register routes
+	router.Router.Register(e) // register routes
 
 	// Add dev setup
 	if env == settings.EnvDevelopment {

@@ -1,4 +1,4 @@
-package services
+package jwt
 
 import (
 	"time"
@@ -6,6 +6,8 @@ import (
 	"github.com/BeGeos/go-echo/internal/settings"
 	"github.com/golang-jwt/jwt/v5"
 )
+
+type _Services struct{}
 
 var jwtSecret = []byte(settings.JwtSecretKey)
 
@@ -30,7 +32,7 @@ type RefreshJwtClaims struct {
 
 type JwtService struct{}
 
-func (s *JwtService) NewAccessToken(c AccessTokenClaims) (string, error) {
+func (s *_Services) NewAccessToken(c AccessTokenClaims) (string, error) {
 	claims := &JwtClaims{
 		AccessTokenClaims: AccessTokenClaims{
 			UserID: c.UserID,
@@ -45,7 +47,7 @@ func (s *JwtService) NewAccessToken(c AccessTokenClaims) (string, error) {
 	return token.SignedString(jwtSecret)
 }
 
-func (s *JwtService) NewRefreshToken(c RefreshTokenClaims) (string, error) {
+func (s *_Services) NewRefreshToken(c RefreshTokenClaims) (string, error) {
 	claims := &RefreshJwtClaims{
 		RefreshTokenClaims: RefreshTokenClaims{
 			UserID:  c.UserID,
@@ -60,3 +62,5 @@ func (s *JwtService) NewRefreshToken(c RefreshTokenClaims) (string, error) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	return token.SignedString(jwtSecret)
 }
+
+var Services = &_Services{}

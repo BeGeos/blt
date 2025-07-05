@@ -9,15 +9,12 @@ import (
 
 	"golang.org/x/time/rate"
 
-	"github.com/go-playground/validator/v10"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 
 	"github.com/BeGeos/go-echo/internal/config"
 	"github.com/BeGeos/go-echo/internal/handlers"
-	"github.com/BeGeos/go-echo/internal/router"
 	"github.com/BeGeos/go-echo/internal/settings"
-	"github.com/BeGeos/go-echo/internal/validators"
 	"github.com/BeGeos/go-echo/pkg/sentry"
 )
 
@@ -84,7 +81,7 @@ func Setup() *echo.Echo {
 	}))
 
 	e.HTTPErrorHandler = handlers.ErrorHandler // custom error handler
-	e.Validator = &validators.RequestValidator{Validator: validator.New()}
+	e.Validator = Validators.Request           // custom request validator
 
 	// Add not debug setup
 	if env != settings.EnvDevelopment {
@@ -93,7 +90,7 @@ func Setup() *echo.Echo {
 		stepper.increment()
 	}
 
-	router.Router.Register(e) // register routes
+	Router.Register(e) // register routes
 
 	// Add dev setup
 	if env == settings.EnvDevelopment {

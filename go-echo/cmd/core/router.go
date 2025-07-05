@@ -9,7 +9,7 @@ import (
 	"github.com/BeGeos/go-echo/cmd/apps/auth"
 )
 
-func RegisterRootRoutes(e *echo.Echo) {
+func registerRootRoutes(e *echo.Echo) {
 	e.GET("/", RootHandler).Name = "home"
 	e.GET("/ping", HealthCheckHandler).Name = "ping"
 }
@@ -20,7 +20,7 @@ func RegisterPprofRoutes(e *echo.Echo) {
 
 func RegisterRoutes(e *echo.Echo) {
 	// Register your routes here
-	RegisterRootRoutes(e)
+	registerRootRoutes(e)
 
 	// 2.0
 	auth.RegisterAuthRoutes(e)

@@ -69,11 +69,11 @@ func (a *_App) Setup() *echo.Echo {
 		stepper.increment()
 	}
 
-	Router.Register(e) // register routes
+	RegisterRoutes(e)
 
 	// Add dev setup
 	if env == settings.EnvDevelopment {
-		Router.RegisterPprofRoutes(e) // add pprof routes for debugging
+		RegisterPprofRoutes(e) // add pprof routes for debugging
 		fmt.Printf("%d. Pprof routes added for debugging ✅\n", step)
 		stepper.increment()
 

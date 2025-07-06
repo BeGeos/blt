@@ -40,7 +40,7 @@ func (h *handler) Login(c echo.Context) error {
 }
 
 func (h *handler) Logout(c echo.Context) error {
-	return c.JSON(http.StatusNoContent, h.response.Empty())
+	return c.NoContent(http.StatusNoContent)
 }
 
 func (h *handler) Register(c echo.Context) error {
@@ -98,7 +98,7 @@ func (h *handler) ResetPasswordRequest(c echo.Context) error {
 
 	// generate reset password code and send email
 	// either person exists or not, we return 204 No Content
-	return c.JSON(http.StatusNoContent, h.response.Empty())
+	return c.NoContent(http.StatusNoContent)
 }
 
 func (h *handler) ResetPassword(c echo.Context) error {
@@ -112,7 +112,7 @@ func (h *handler) ResetPassword(c echo.Context) error {
 	}
 
 	// look for token and fetch person
-	return c.JSON(http.StatusNoContent, h.response.Empty())
+	return c.NoContent(http.StatusNoContent)
 }
 
 func NewHandler(s *Services) Handler {

@@ -3,28 +3,39 @@ package auth
 import (
 	"errors"
 
+	"golang.org/x/crypto/bcrypt"
+
 	appjwt "github.com/BeGeos/go-echo/cmd/apps/auth/jwt"
 )
+
+type Services struct {
+	// Injected services
+	Token    Token
+	Password Password
+}
+
+func NewServices() *Services {
+	return &Services{
+		Token:    newAuthTokenService(),
+		Password: newPasswordService(),
+	}
+}
 
 type Token interface {
 	GetValidTokens(userID, version uint) (Tokens, error)
 	GetNewAccessToken(userID uint) (string, error)
 }
-type (
-	Services struct {
-		// Injected services
-		Token Token
-	}
-)
 
-// Subservices - this are private and
-// managed by the main service
-type (
-	_AuthTokenService struct {
-		Jwt appjwt.Jwt
+// Subservices - this are private
+type _AuthTokenService struct {
+	Jwt appjwt.Jwt
+}
+
+func newAuthTokenService() Token {
+	return &_AuthTokenService{
+		Jwt: appjwt.NewJwt(),
 	}
-	_PasswordService struct{}
-)
+}
 
 func (s *_AuthTokenService) GetValidTokens(userID, version uint) (Tokens, error) {
 	type ResultCh struct {
@@ -78,14 +89,24 @@ func (s *_AuthTokenService) GetNewAccessToken(userID uint) (string, error) {
 	return token, nil
 }
 
-func newAuthTokenService() Token {
-	return &_AuthTokenService{
-		Jwt: appjwt.NewJwt(),
-	}
+type Password interface {
+	Hash(password string) ([]byte, error)
+	Compare(hashedPassword, password string) error
+}
+type _PasswordService struct{}
+
+func newPasswordService() Password {
+	return &_PasswordService{}
 }
 
-func NewServices() *Services {
-	return &Services{
-		Token: newAuthTokenService(),
-	}
+type HashPasswordArgs struct {
+	Cost int
+}
+
+func (s *_PasswordService) Hash(password string) ([]byte, error) {
+	return bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+}
+
+func (s *_PasswordService) Compare(hashedPassword, password string) error {
+	return bcrypt.CompareHashAndPassword([]byte(hashedPassword), []byte(password))
 }

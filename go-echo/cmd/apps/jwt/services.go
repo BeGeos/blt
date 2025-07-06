@@ -11,10 +11,11 @@ type Jwt interface {
 	New(claims interface{}, args NewArgs) (string, error)
 }
 type (
-	token    struct{}
 	Services struct {
+		// Injected
 		Jwt Jwt
 	}
+	token struct{}
 )
 
 var jwtSecret = []byte(settings.JwtSecretKey)
@@ -27,16 +28,16 @@ func (s *token) New(claims interface{}, args NewArgs) (string, error) {
 	switch args.Kind {
 	case "access":
 		claims, _ := claims.(AccessTokenClaims)
-		return s.newAccessToken(claims)
+		return newAccessToken(claims)
 	case "refresh":
 		claims, _ := claims.(RefreshTokenClaims)
-		return s.newRefreshToken(claims)
+		return newRefreshToken(claims)
 	}
 
 	return "", jwt.ErrInvalidKeyType
 }
 
-func (s *token) newAccessToken(c AccessTokenClaims) (string, error) {
+func newAccessToken(c AccessTokenClaims) (string, error) {
 	claims := &JwtClaims{
 		AccessTokenClaims: AccessTokenClaims{
 			UserID: c.UserID,
@@ -51,7 +52,7 @@ func (s *token) newAccessToken(c AccessTokenClaims) (string, error) {
 	return token.SignedString(jwtSecret)
 }
 
-func (s *token) newRefreshToken(c RefreshTokenClaims) (string, error) {
+func newRefreshToken(c RefreshTokenClaims) (string, error) {
 	claims := &RefreshJwtClaims{
 		RefreshTokenClaims: RefreshTokenClaims{
 			UserID:  c.UserID,

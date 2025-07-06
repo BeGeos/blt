@@ -19,6 +19,7 @@ type Handler interface {
 }
 type handler struct {
 	services *Services
+	response *Response
 }
 
 func (h *handler) Login(c echo.Context) error {
@@ -34,12 +35,12 @@ func (h *handler) Login(c echo.Context) error {
 
 	return c.JSON(
 		http.StatusOK,
-		Schemas.Response().Tokens(tokens.AccessToken, tokens.RefreshToken),
+		h.response.Tokens(tokens.AccessToken, tokens.RefreshToken),
 	)
 }
 
 func (h *handler) Logout(c echo.Context) error {
-	return c.JSON(http.StatusNoContent, Schemas.Response().Empty())
+	return c.JSON(http.StatusNoContent, h.response.Empty())
 }
 
 func (h *handler) Register(c echo.Context) error {
@@ -63,7 +64,7 @@ func (h *handler) Register(c echo.Context) error {
 
 	return c.JSON(
 		http.StatusOK,
-		Schemas.Response().Tokens(tokens.AccessToken, tokens.RefreshToken),
+		h.response.Tokens(tokens.AccessToken, tokens.RefreshToken),
 	)
 }
 
@@ -82,7 +83,7 @@ func (h *handler) Refresh(c echo.Context) error {
 		return err
 	}
 
-	return c.JSON(http.StatusOK, Schemas.Response().Token(token))
+	return c.JSON(http.StatusOK, h.response.Token(token))
 }
 
 func (h *handler) ResetPasswordRequest(c echo.Context) error {
@@ -97,7 +98,7 @@ func (h *handler) ResetPasswordRequest(c echo.Context) error {
 
 	// generate reset password code and send email
 	// either person exists or not, we return 204 No Content
-	return c.JSON(http.StatusNoContent, Schemas.Response().Empty())
+	return c.JSON(http.StatusNoContent, h.response.Empty())
 }
 
 func (h *handler) ResetPassword(c echo.Context) error {
@@ -111,11 +112,12 @@ func (h *handler) ResetPassword(c echo.Context) error {
 	}
 
 	// look for token and fetch person
-	return c.JSON(http.StatusNoContent, Schemas.Response().Empty())
+	return c.JSON(http.StatusNoContent, h.response.Empty())
 }
 
 func NewHandler(s *Services) Handler {
 	return &handler{
 		services: s,
+		response: &Response{},
 	}
 }

@@ -3,9 +3,7 @@ package auth
 import (
 	"errors"
 
-	"github.com/BeGeos/go-echo/cmd/apps/jwt"
-
-	appjwt "github.com/BeGeos/go-echo/cmd/apps/jwt"
+	appjwt "github.com/BeGeos/go-echo/cmd/apps/auth/jwt"
 )
 
 type Token interface {
@@ -14,9 +12,6 @@ type Token interface {
 }
 type (
 	Services struct {
-		// Dependencies
-		JwtServices *appjwt.Services
-
 		// Injected services
 		Token Token
 	}
@@ -26,7 +21,7 @@ type (
 // managed by the main service
 type (
 	_AuthTokenService struct {
-		JwtServices *appjwt.Services
+		Jwt appjwt.Jwt
 	}
 	_PasswordService struct{}
 )
@@ -41,19 +36,19 @@ func (s *_AuthTokenService) GetValidTokens(userID, version uint) (Tokens, error)
 	refreshCh := make(chan ResultCh)
 
 	go func(ch chan ResultCh) {
-		claims := jwt.AccessTokenClaims{
+		claims := appjwt.AccessTokenClaims{
 			UserID: userID,
 		}
-		token, err := s.JwtServices.Jwt.New(claims, jwt.NewArgs{Kind: "access"})
+		token, err := s.Jwt.New(claims, appjwt.NewJwtArgs{Kind: "access"})
 		ch <- ResultCh{token: token, err: err}
 	}(accessCh)
 
 	go func(ch chan ResultCh) {
-		claims := jwt.RefreshTokenClaims{
+		claims := appjwt.RefreshTokenClaims{
 			UserID:  userID,
 			Version: version, // replace with actual version check logic
 		}
-		token, err := s.JwtServices.Jwt.New(claims, jwt.NewArgs{Kind: "refresh"})
+		token, err := s.Jwt.New(claims, appjwt.NewJwtArgs{Kind: "refresh"})
 		ch <- ResultCh{token: token, err: err}
 	}(refreshCh)
 
@@ -71,11 +66,11 @@ func (s *_AuthTokenService) GetValidTokens(userID, version uint) (Tokens, error)
 }
 
 func (s *_AuthTokenService) GetNewAccessToken(userID uint) (string, error) {
-	claims := jwt.AccessTokenClaims{
+	claims := appjwt.AccessTokenClaims{
 		UserID: userID,
 	}
 
-	token, err := s.JwtServices.Jwt.New(claims, jwt.NewArgs{Kind: "access"})
+	token, err := s.Jwt.New(claims, appjwt.NewJwtArgs{Kind: "access"})
 	if err != nil {
 		return "", errors.New("failed to create token")
 	}
@@ -83,25 +78,14 @@ func (s *_AuthTokenService) GetNewAccessToken(userID uint) (string, error) {
 	return token, nil
 }
 
-type newAuthTokenServiceArgs struct {
-	JwtServices *appjwt.Services
-}
-
-func newAuthTokenService(args newAuthTokenServiceArgs) Token {
+func newAuthTokenService() Token {
 	return &_AuthTokenService{
-		JwtServices: args.JwtServices,
+		Jwt: appjwt.NewJwt(),
 	}
 }
 
-type ServicesArgs struct {
-	JwtServices *appjwt.Services
-}
-
-func NewServices(args ServicesArgs) *Services {
+func NewServices() *Services {
 	return &Services{
-		JwtServices: args.JwtServices,
-		Token: newAuthTokenService(newAuthTokenServiceArgs{
-			JwtServices: args.JwtServices,
-		}),
+		Token: newAuthTokenService(),
 	}
 }

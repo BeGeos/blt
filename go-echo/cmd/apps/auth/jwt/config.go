@@ -1,4 +1,4 @@
-package jwt
+package auth
 
 import (
 	"log"
@@ -10,11 +10,6 @@ import (
 	"github.com/BeGeos/go-echo/internal/schema"
 	"github.com/BeGeos/go-echo/internal/settings"
 )
-
-type _Config struct {
-	JwtAuthenticatedConfig      echojwt.Config
-	JwtMaybeAuthenticatedConfig echojwt.Config
-}
 
 var contextKey = settings.JwtContextKey
 
@@ -54,12 +49,26 @@ func getJwtConfig(args Args) echojwt.Config {
 	}
 }
 
-var (
-	jwtAuthenticatedConfig      = getJwtConfig(Args{authenticationRequired: true})
-	jwtMaybeAuthenticatedConfig = getJwtConfig(Args{authenticationRequired: false})
-)
-
-var Config = &_Config{
-	JwtAuthenticatedConfig:      jwtAuthenticatedConfig,
-	JwtMaybeAuthenticatedConfig: jwtMaybeAuthenticatedConfig,
+type AccessTokenClaims struct {
+	UserID uint `json:"user_id"`
 }
+
+type RefreshTokenClaims struct {
+	UserID  uint `json:"user_id"`
+	Version uint `json:"version"`
+}
+
+type JwtClaims struct {
+	AccessTokenClaims
+	jwt.RegisteredClaims
+}
+
+type RefreshJwtClaims struct {
+	RefreshTokenClaims
+	jwt.RegisteredClaims
+}
+
+var (
+	JwtAuthenticatedConfig      = getJwtConfig(Args{authenticationRequired: true})
+	JwtMaybeAuthenticatedConfig = getJwtConfig(Args{authenticationRequired: false})
+)

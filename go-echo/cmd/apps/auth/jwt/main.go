@@ -1,4 +1,4 @@
-package jwt
+package auth
 
 import (
 	"time"
@@ -7,24 +7,18 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 )
 
-type Jwt interface {
-	New(claims interface{}, args NewArgs) (string, error)
-}
-type (
-	Services struct {
-		// Injected
-		Jwt Jwt
-	}
-	token struct{}
-)
-
 var jwtSecret = []byte(settings.JwtSecretKey)
 
-type NewArgs struct {
+type NewJwtArgs struct {
 	Kind string
 }
+type Jwt interface {
+	New(claims interface{}, args NewJwtArgs) (string, error)
+}
 
-func (s *token) New(claims interface{}, args NewArgs) (string, error) {
+type _Token struct{}
+
+func (s *_Token) New(claims interface{}, args NewJwtArgs) (string, error) {
 	switch args.Kind {
 	case "access":
 		claims, _ := claims.(AccessTokenClaims)
@@ -68,12 +62,6 @@ func newRefreshToken(c RefreshTokenClaims) (string, error) {
 	return token.SignedString(jwtSecret)
 }
 
-func newJwtService() Jwt {
-	return &token{}
-}
-
-func NewServices() *Services {
-	return &Services{
-		Jwt: newJwtService(),
-	}
+func NewJwt() Jwt {
+	return &_Token{}
 }

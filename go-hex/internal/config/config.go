@@ -26,6 +26,12 @@ var (
 	once sync.Once
 )
 
+var (
+	EnvDevelopment = "dev"
+	EnvStaging     = "staging"
+	EnvProduction  = "prod"
+)
+
 func Load() (*Config, error) {
 	once.Do(func() {
 		env := getEnv("GO_ENV", "dev")

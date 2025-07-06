@@ -14,16 +14,23 @@ type Token interface {
 }
 type (
 	Services struct {
+		// Dependencies
 		JwtServices *appjwt.Services
-		Token       Token
+
+		// Injected services
+		Token Token
 	}
+)
+
+// Subservices - this are private and
+// managed by the main service
+type (
 	_AuthTokenService struct {
 		JwtServices *appjwt.Services
 	}
 	_PasswordService struct{}
 )
 
-// TODO: pass args for the claims
 func (s *_AuthTokenService) GetValidTokens(userID, version uint) (Tokens, error) {
 	type ResultCh struct {
 		token string

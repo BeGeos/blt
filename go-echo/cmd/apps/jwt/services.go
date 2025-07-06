@@ -7,13 +7,13 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 )
 
-type Token interface {
+type Jwt interface {
 	New(claims interface{}, args NewArgs) (string, error)
 }
 type (
 	token    struct{}
 	Services struct {
-		Token Token
+		Jwt Jwt
 	}
 )
 
@@ -67,12 +67,12 @@ func (s *token) newRefreshToken(c RefreshTokenClaims) (string, error) {
 	return token.SignedString(jwtSecret)
 }
 
-func newTokenService() Token {
+func newJwtService() Jwt {
 	return &token{}
 }
 
 func NewServices() *Services {
 	return &Services{
-		Token: newTokenService(),
+		Jwt: newJwtService(),
 	}
 }

@@ -23,6 +23,8 @@ func (rv *RequestValidator) Validate(i any) error {
 	return nil
 }
 
-var Validators = &_Validators{
-	Request: &RequestValidator{Validator: validator.New()},
+func GetValidators() *_Validators {
+	return &_Validators{
+		Request: &RequestValidator{Validator: validator.New()},
+	}
 }

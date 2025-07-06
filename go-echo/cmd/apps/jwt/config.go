@@ -1,4 +1,4 @@
-package auth
+package jwt
 
 import (
 	"log"
@@ -9,8 +9,6 @@ import (
 
 	"github.com/BeGeos/go-echo/internal/schema"
 	"github.com/BeGeos/go-echo/internal/settings"
-
-	appjwt "github.com/BeGeos/go-echo/cmd/apps/jwt"
 )
 
 type _Config struct {
@@ -30,7 +28,7 @@ func successHandler(c echo.Context) {
 
 	token, ok := c.Get(contextKey).(*jwt.Token)
 	if ok {
-		claims, _ := token.Claims.(*appjwt.JwtClaims)
+		claims, _ := token.Claims.(*JwtClaims)
 
 		// fetch person from database and put into context
 		// TODO: remove this print
@@ -40,7 +38,7 @@ func successHandler(c echo.Context) {
 }
 
 func newClaimsFunc(c echo.Context) jwt.Claims {
-	return new(appjwt.JwtClaims)
+	return new(JwtClaims)
 }
 
 func getJwtConfig(args Args) echojwt.Config {

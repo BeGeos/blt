@@ -8,7 +8,7 @@ import (
 	"github.com/BeGeos/go-echo/internal/schema"
 )
 
-type Handlers interface {
+type Handler interface {
 	Login(c echo.Context) error
 	Logout(c echo.Context) error
 	Me(c echo.Context) error
@@ -17,11 +17,11 @@ type Handlers interface {
 	ResetPassword(c echo.Context) error
 	Refresh(c echo.Context) error
 }
-type handlers struct {
+type handler struct {
 	services *Services
 }
 
-func (h *handlers) Login(c echo.Context) error {
+func (h *handler) Login(c echo.Context) error {
 	// TODO: fetch person by email and check password
 
 	person := &schema.Person{}
@@ -38,11 +38,11 @@ func (h *handlers) Login(c echo.Context) error {
 	)
 }
 
-func (h *handlers) Logout(c echo.Context) error {
+func (h *handler) Logout(c echo.Context) error {
 	return c.JSON(http.StatusNoContent, Schemas.Response().Empty())
 }
 
-func (h *handlers) Register(c echo.Context) error {
+func (h *handler) Register(c echo.Context) error {
 	var req RegisterRequestDto
 	if err := c.Bind(&req); err != nil {
 		return echo.ErrBadRequest
@@ -67,14 +67,14 @@ func (h *handlers) Register(c echo.Context) error {
 	)
 }
 
-func (h *handlers) Me(c echo.Context) error {
+func (h *handler) Me(c echo.Context) error {
 	person := &schema.Person{}
 	user := person.New()
 
 	return c.JSON(http.StatusOK, user)
 }
 
-func (h *handlers) Refresh(c echo.Context) error {
+func (h *handler) Refresh(c echo.Context) error {
 	person, _ := c.Get("person").(schema.PersonSchema) // add casting when person model is defined
 
 	token, err := h.services.Token.GetNewAccessToken(person.UserID)
@@ -85,7 +85,7 @@ func (h *handlers) Refresh(c echo.Context) error {
 	return c.JSON(http.StatusOK, Schemas.Response().Token(token))
 }
 
-func (h *handlers) ResetPasswordRequest(c echo.Context) error {
+func (h *handler) ResetPasswordRequest(c echo.Context) error {
 	var req ResetPasswordRequestDto
 	if err := c.Bind(&req); err != nil {
 		return echo.ErrBadRequest
@@ -100,7 +100,7 @@ func (h *handlers) ResetPasswordRequest(c echo.Context) error {
 	return c.JSON(http.StatusNoContent, Schemas.Response().Empty())
 }
 
-func (h *handlers) ResetPassword(c echo.Context) error {
+func (h *handler) ResetPassword(c echo.Context) error {
 	var req ResetPasswordDto
 	if err := c.Bind(&req); err != nil {
 		return echo.ErrBadRequest
@@ -114,8 +114,8 @@ func (h *handlers) ResetPassword(c echo.Context) error {
 	return c.JSON(http.StatusNoContent, Schemas.Response().Empty())
 }
 
-func NewHandlers(s *Services) Handlers {
-	return &handlers{
+func NewHandler(s *Services) Handler {
+	return &handler{
 		services: s,
 	}
 }

@@ -10,8 +10,8 @@ import (
 )
 
 func registerRootRoutes(e *echo.Echo) {
-	e.GET("/", RootHandler).Name = "home"
-	e.GET("/ping", HealthCheckHandler).Name = "ping"
+	e.GET("/", HandleRoot).Name = "home"
+	e.GET("/ping", HandleHealthcheck).Name = "ping"
 }
 
 func RegisterPprofRoutes(e *echo.Echo) {

@@ -37,7 +37,7 @@ func (s *_AuthTokenService) GetValidTokens(userID, version uint) (Tokens, error)
 		claims := jwt.AccessTokenClaims{
 			UserID: userID,
 		}
-		token, err := s.JwtServices.Token.New(claims, jwt.NewArgs{Kind: "access"})
+		token, err := s.JwtServices.Jwt.New(claims, jwt.NewArgs{Kind: "access"})
 		ch <- ResultCh{token: token, err: err}
 	}(accessCh)
 
@@ -46,7 +46,7 @@ func (s *_AuthTokenService) GetValidTokens(userID, version uint) (Tokens, error)
 			UserID:  userID,
 			Version: version, // replace with actual version check logic
 		}
-		token, err := s.JwtServices.Token.New(claims, jwt.NewArgs{Kind: "refresh"})
+		token, err := s.JwtServices.Jwt.New(claims, jwt.NewArgs{Kind: "refresh"})
 		ch <- ResultCh{token: token, err: err}
 	}(refreshCh)
 
@@ -68,7 +68,7 @@ func (s *_AuthTokenService) GetNewAccessToken(userID uint) (string, error) {
 		UserID: userID,
 	}
 
-	token, err := s.JwtServices.Token.New(claims, jwt.NewArgs{Kind: "access"})
+	token, err := s.JwtServices.Jwt.New(claims, jwt.NewArgs{Kind: "access"})
 	if err != nil {
 		return "", errors.New("failed to create token")
 	}
@@ -76,9 +76,6 @@ func (s *_AuthTokenService) GetNewAccessToken(userID uint) (string, error) {
 	return token, nil
 }
 
-type ServicesArgs struct {
-	JwtServices *appjwt.Services
-}
 type newAuthTokenServiceArgs struct {
 	JwtServices *appjwt.Services
 }
@@ -87,6 +84,10 @@ func newAuthTokenService(args newAuthTokenServiceArgs) Token {
 	return &_AuthTokenService{
 		JwtServices: args.JwtServices,
 	}
+}
+
+type ServicesArgs struct {
+	JwtServices *appjwt.Services
 }
 
 func NewServices(args ServicesArgs) *Services {

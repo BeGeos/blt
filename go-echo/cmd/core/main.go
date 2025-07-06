@@ -59,8 +59,8 @@ func (a *_App) Setup() *echo.Echo {
 		Timeout: 30 * time.Second, // 30 seconds timeout
 	}))
 
-	e.HTTPErrorHandler = ErrorHandler // custom error handler
-	e.Validator = Validators.Request  // custom request validator
+	e.HTTPErrorHandler = ErrorHandler     // custom error handler
+	e.Validator = GetValidators().Request // custom request validator
 
 	// Add not debug setup
 	if env != settings.EnvDevelopment {

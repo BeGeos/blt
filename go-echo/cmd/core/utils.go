@@ -1,11 +1,5 @@
 package core
 
-type Utils interface {
-	Stepper(start *int) stepper
-	CheckEnvVariables() error
-}
-type utils struct{}
-
 type stepper struct {
 	start *int
 }
@@ -17,6 +11,12 @@ func (s *stepper) increment() {
 func (s *stepper) decrement() {
 	*s.start--
 }
+
+type Utils interface {
+	Stepper(start *int) stepper
+	CheckEnvVariables() error
+}
+type utils struct{}
 
 func (u *utils) CheckEnvVariables() error {
 	// these are the variables that must be set in the environment

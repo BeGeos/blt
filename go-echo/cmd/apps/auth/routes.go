@@ -10,34 +10,34 @@ import (
 )
 
 func RegisterAuthRoutes(e *echo.Echo) {
-	handlers := NewHandlers(NewServices(ServicesArgs{
+	handler := NewHandler(NewServices(ServicesArgs{
 		JwtServices: appjwt.NewServices(),
 	}))
-	g := e.Group("/auth") // limited to 5 requests per minute
+	g := e.Group("/auth")
 
 	// requires authentication
-	authenticated := g.Group("", echojwt.WithConfig(Config.JwtAuthenticatedConfig), Authenticated)
+	authenticated := g.Group("", echojwt.WithConfig(appjwt.Config.JwtAuthenticatedConfig), Authenticated)
 
-	authenticated.GET("/me", handlers.Me).Name = "auth:me"
-	authenticated.POST("/logout", handlers.Logout).Name = "auth:logout"
+	authenticated.GET("/me", handler.Me).Name = "auth:me"
+	authenticated.POST("/logout", handler.Logout).Name = "auth:logout"
 
 	// must not be authenticated
 	notAuthenticated := g.Group(
 		"",
-		middleware.RateLimiterWithConfig(config.GetAuthenticationRateLimiterConfig()),
-		echojwt.WithConfig(Config.JwtMaybeAuthenticatedConfig),
+		middleware.RateLimiterWithConfig(config.GetAuthenticationRateLimiterConfig()), // limited to 5 requests per minute
+		echojwt.WithConfig(appjwt.Config.JwtMaybeAuthenticatedConfig),
 		NotAuthenticated,
 	)
 
-	notAuthenticated.POST("/login", handlers.Login).Name = "auth:login"
-	notAuthenticated.POST("/register", handlers.Register).Name = "auth:register"
-	notAuthenticated.POST("/reset-password", handlers.ResetPasswordRequest).Name = "auth:reset-password-request"
-	notAuthenticated.POST("/reset-password/:token", handlers.ResetPassword).Name = "auth:reset-password"
+	notAuthenticated.POST("/login", handler.Login).Name = "auth:login"
+	notAuthenticated.POST("/register", handler.Register).Name = "auth:register"
+	notAuthenticated.POST("/reset-password", handler.ResetPasswordRequest).Name = "auth:reset-password-request"
+	notAuthenticated.POST("/reset-password/:token", handler.ResetPassword).Name = "auth:reset-password"
 
 	maybeAuthenticated := g.Group(
 		"",
 		middleware.RateLimiterWithConfig(config.GetAuthenticationRateLimiterConfig()),
 		appjwt.ValidateRefreshToken,
 	) // one-handler group for documentation purposes
-	maybeAuthenticated.POST("/refresh", handlers.Refresh).Name = "auth:refresh"
+	maybeAuthenticated.POST("/refresh", handler.Refresh).Name = "auth:refresh"
 }

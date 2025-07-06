@@ -23,7 +23,6 @@ func Authenticated(next echo.HandlerFunc) echo.HandlerFunc {
 			hub.ConfigureScope(func(scope *sentry.Scope) {
 				scope.SetUser(sentry.User{
 					ID:        strconv.Itoa(int(person.UserID)),
-					Email:     person.Email,
 					IPAddress: c.RealIP(),
 				})
 			})

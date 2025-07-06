@@ -34,4 +34,5 @@ var (
 	JwtContextKey = getEnvKey("JWT_CONTEXT_KEY", "tkn")
 )
 
+// Sentry
 var SentryDsn = getEnvKey("SENTRY_DSN", "")

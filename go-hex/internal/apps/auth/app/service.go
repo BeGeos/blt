@@ -1,14 +1,13 @@
 package auth
 
 import (
-	"errors"
-
+	"go-hex/internal/apps/apperrors"
 	appjwt "go-hex/internal/infrastructure/jwt"
 )
 
 var (
-	ErrInvalidCredentials = errors.New("invalid email or password")
-	ErrPersonNotFound     = errors.New("person not found")
+	ErrInvalidCredentials = apperrors.New("invalid_credentials", "invalid credentials")
+	ErrPersonNotFound     = apperrors.New("person_not_found", "person not found")
 )
 
 type Service struct {

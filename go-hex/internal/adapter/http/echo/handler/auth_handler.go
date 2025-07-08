@@ -12,7 +12,25 @@ type AuthHandler struct {
 }
 
 func (h *AuthHandler) Login(c echo.Context) error {
-	return c.JSON(http.StatusOK, "Login endpoint not implemented yet")
+	type Request struct {
+		Email    string `json:"email" validate:"required,email"`
+		Password string `json:"password" validate:"required,min=6"`
+	}
+	var req Request
+
+	if err := c.Bind(&req); err != nil {
+		return echo.ErrBadRequest
+	}
+
+	if err := c.Validate(&req); err != nil {
+		return err
+	}
+
+	tokens, err := h.authService.Login(req.Email, req.Password)
+	if err != nil {
+		return echo.NewHTTPError(err.ToHttp(), err.Error())
+	}
+	return c.JSON(http.StatusOK, tokens)
 }
 
 func (h *AuthHandler) Logout(c echo.Context) error {

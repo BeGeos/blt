@@ -25,14 +25,6 @@ func (s *EchoServer) Start() error {
 	// Init Echo
 	e := echo.New()
 
-	// Open handlers
-	e.GET("/", func(c echo.Context) error {
-		return c.String(http.StatusOK, "Ready ✅")
-	})
-	e.GET("/ping", func(c echo.Context) error {
-		return c.String(http.StatusOK, "pong")
-	})
-
 	mcfg := appmiddleware.NewMiddlewareConfig()
 
 	e.Use(middleware.RequestID())
@@ -46,6 +38,14 @@ func (s *EchoServer) Start() error {
 	e.Use(middleware.TimeoutWithConfig(middleware.TimeoutConfig{
 		Timeout: 30 * time.Second, // 30 seconds timeout
 	}))
+
+	// Open handlers
+	e.GET("/", func(c echo.Context) error {
+		return c.String(http.StatusOK, "Ready ✅")
+	}).Name = "root:index"
+	e.GET("/ping", func(c echo.Context) error {
+		return c.String(http.StatusOK, "pong")
+	}).Name = "root:ping"
 
 	e.HTTPErrorHandler = ErrorHandler
 	e.Validator = NewValidator()

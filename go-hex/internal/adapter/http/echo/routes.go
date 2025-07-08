@@ -25,7 +25,7 @@ func registerAuthRoutes(e *echo.Echo) {
 		appjwt.GetJwtConfig(appjwt.GetConfigArgs{AuthenticationRequired: true})),
 		appmiddleware.Authenticated,
 	)
-	authenticated.POST("/logout", h.Logout)
+	authenticated.POST("/logout", h.Logout).Name = "auth:logout"
 
 	notAuthenticated := g.Group("",
 		middleware.RateLimiterWithConfig(mcfg.AuthenticationRateLimiter()),
@@ -33,13 +33,13 @@ func registerAuthRoutes(e *echo.Echo) {
 			appjwt.GetJwtConfig(appjwt.GetConfigArgs{AuthenticationRequired: false})),
 		appmiddleware.NotAuthenticated,
 	)
-	notAuthenticated.POST("/login", h.Login)
-	notAuthenticated.POST("/register", h.Register)
+	notAuthenticated.POST("/login", h.Login).Name = "auth:login"
+	notAuthenticated.POST("/register", h.Register).Name = "auth:register"
 
 	maybeAuthenticated := g.Group("",
 		middleware.RateLimiterWithConfig(mcfg.AuthenticationRateLimiter()),
 	) // group for docs only
-	maybeAuthenticated.POST("/refresh", h.Refresh)
+	maybeAuthenticated.POST("/refresh", h.Refresh).Name = "auth:refresh"
 }
 
 func RegisterRoutes(e *echo.Echo) {

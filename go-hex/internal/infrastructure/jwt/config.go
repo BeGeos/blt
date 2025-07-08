@@ -20,8 +20,6 @@ func newClaimsFunc(c echo.Context) jwt.Claims {
 func getJwtConfig(args GetConfigArgs) echojwt.Config {
 	cfg, _ := config.Load()
 
-	log.Printf("JWT secret key: %s", cfg.Authentication.SigningKey)
-
 	return echojwt.Config{
 		Skipper: func(c echo.Context) bool {
 			auth := c.Request().Header.Get(echo.HeaderAuthorization)

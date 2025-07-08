@@ -42,8 +42,8 @@ func Load() (*Config, error) {
 	once.Do(func() {
 		env := getEnv("GO_ENV", "dev")
 
-		_ = godotenv.Load(".env")        // always try base
 		_ = godotenv.Load(".env." + env) // e.g., .env.local or .env.dev
+		_ = godotenv.Load(".env")        // from docs - Existing envs take precedence of envs that are loaded later
 
 		cfg = &Config{
 			Env: env,

@@ -22,7 +22,7 @@ func (s *JwtService) NewAccessToken(c AccessTokenClaims) (string, error) {
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	return token.SignedString(cfg.Authentication.SigningKey)
+	return token.SignedString([]byte(cfg.Authentication.SigningKey))
 }
 
 func (s *JwtService) NewRefreshToken(c RefreshTokenClaims) (string, error) {
@@ -39,7 +39,7 @@ func (s *JwtService) NewRefreshToken(c RefreshTokenClaims) (string, error) {
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	return token.SignedString(cfg.Authentication.SigningKey)
+	return token.SignedString([]byte(cfg.Authentication.SigningKey))
 }
 
 func NewJwtService() *JwtService {

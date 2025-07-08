@@ -17,13 +17,13 @@ func newClaimsFunc(c echo.Context) jwt.Claims {
 	return new(JwtClaims)
 }
 
-func getJwtConfig(args GetConfigArgs) echojwt.Config {
+func GetJwtConfig(args GetConfigArgs) echojwt.Config {
 	cfg, _ := config.Load()
 
 	return echojwt.Config{
 		Skipper: func(c echo.Context) bool {
 			auth := c.Request().Header.Get(echo.HeaderAuthorization)
-			return auth == "" && !args.authenticationRequired
+			return auth == "" && !args.AuthenticationRequired
 		},
 		SuccessHandler: successHandler,
 		ContextKey:     cfg.Authentication.ContextKey,

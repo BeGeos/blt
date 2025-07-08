@@ -41,6 +41,10 @@ func (h *AuthHandler) Register(c echo.Context) error {
 	return c.JSON(http.StatusOK, "Register endpoint not implemented yet")
 }
 
+func (h *AuthHandler) Refresh(c echo.Context) error {
+	return c.JSON(http.StatusOK, "Register endpoint not implemented yet")
+}
+
 func NewAuthHandler(authService *auth.Service) *AuthHandler {
 	return &AuthHandler{
 		authService: authService,

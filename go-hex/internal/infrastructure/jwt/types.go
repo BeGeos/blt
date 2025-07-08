@@ -5,7 +5,7 @@ import (
 )
 
 type GetConfigArgs struct {
-	authenticationRequired bool
+	AuthenticationRequired bool
 }
 
 type AccessTokenClaims struct {

@@ -1,11 +1,11 @@
 package echo
 
 import (
+	"go-hex/internal/adapter"
 	"go-hex/internal/config"
 	"net/http"
 	"time"
 
-	apphttp "go-hex/internal/adapter/http"
 	appmiddleware "go-hex/internal/adapter/http/echo/middleware"
 
 	"github.com/labstack/echo/v4"
@@ -55,6 +55,6 @@ func (s *EchoServer) Start() error {
 	return e.Start(cfg.Server.Port)
 }
 
-func NewServer() apphttp.Server {
+func NewServer() adapter.Adapter {
 	return &EchoServer{}
 }

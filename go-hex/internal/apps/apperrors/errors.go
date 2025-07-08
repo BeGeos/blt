@@ -2,23 +2,28 @@ package apperrors
 
 import "net/http"
 
-type AppError struct {
+type AppError interface {
+	Error() string
+	ToHttp() int
+}
+
+type appError struct {
 	Code    string
 	Message string
 }
 
-func (e *AppError) Error() string {
+func (e *appError) Error() string {
 	return e.Message
 }
 
-func New(code, message string) *AppError {
-	return &AppError{
+func New(code, message string) AppError {
+	return &appError{
 		Code:    code,
 		Message: message,
 	}
 }
 
-func (e *AppError) ToHttp() int {
+func (e *appError) ToHttp() int {
 	switch e.Code {
 	case "person_not_found":
 		return http.StatusNotFound

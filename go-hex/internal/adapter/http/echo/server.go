@@ -47,6 +47,9 @@ func (s *EchoServer) Start() error {
 		Timeout: 30 * time.Second, // 30 seconds timeout
 	}))
 
+	e.HTTPErrorHandler = ErrorHandler
+	e.Validator = NewValidator()
+
 	RegisterRoutes(e)
 
 	return e.Start(cfg.Server.Port)

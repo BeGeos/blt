@@ -8,9 +8,10 @@ import (
 )
 
 type Config struct {
-	Server   ServerConfig
-	Database DatabaseConfig
-	Env      string
+	Server         ServerConfig
+	Database       DatabaseConfig
+	Authentication AuthenticationConfig
+	Env            string
 }
 
 type ServerConfig struct {
@@ -19,6 +20,11 @@ type ServerConfig struct {
 
 type DatabaseConfig struct {
 	URL string
+}
+
+type AuthenticationConfig struct {
+	SigningKey string
+	ContextKey string
 }
 
 var (
@@ -46,6 +52,10 @@ func Load() (*Config, error) {
 			},
 			Database: DatabaseConfig{
 				URL: getEnv("DATABASE_URL", ""),
+			},
+			Authentication: AuthenticationConfig{
+				SigningKey: getEnv("JWT_SIGNING_KEY", ""),
+				ContextKey: getEnv("JWT_CONTEXT_KEY", "jwt:token"),
 			},
 		}
 	})

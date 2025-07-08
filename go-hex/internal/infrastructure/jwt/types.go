@@ -9,12 +9,12 @@ type GetConfigArgs struct {
 }
 
 type AccessTokenClaims struct {
-	UserID uint `json:"user_id"`
+	UserID int `json:"user_id"`
 }
 
 type RefreshTokenClaims struct {
-	UserID  uint `json:"user_id"`
-	Version uint `json:"version"`
+	UserID  int `json:"user_id"`
+	Version int `json:"version"`
 }
 
 type JwtClaims struct {

@@ -29,6 +29,8 @@ func (e *appError) ToHttp() int {
 		return http.StatusNotFound
 	case "invalid_credentials":
 		return http.StatusUnauthorized
+	case "invalid_token_version":
+		return http.StatusUnauthorized
 	default:
 		return http.StatusInternalServerError
 	}

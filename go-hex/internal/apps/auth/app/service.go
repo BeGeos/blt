@@ -7,8 +7,9 @@ import (
 )
 
 var (
-	ErrInvalidCredentials = apperrors.New("invalid_credentials", "invalid credentials")
-	ErrPersonNotFound     = apperrors.New("person_not_found", "person not found")
+	ErrInvalidCredentials  = apperrors.New("invalid_credentials", "invalid credentials")
+	ErrPersonNotFound      = apperrors.New("person_not_found", "person not found")
+	ErrInvalidTokenVersion = apperrors.New("invalid_token_version", "person not found")
 )
 
 type Service struct {
@@ -42,7 +43,7 @@ func (s *Service) Login(email, password string) (auth.Tokens, apperrors.AppError
 		go func(ch chan ResultCh) {
 			claims := appjwt.RefreshTokenClaims{
 				UserID:  69,
-				Version: 1, // replace with actual version check logic
+				Version: 2, // replace with actual version check logic
 			}
 			token, err := s.JwtService.NewRefreshToken(claims)
 			ch <- ResultCh{token: token, err: err}
@@ -61,4 +62,18 @@ func (s *Service) Login(email, password string) (auth.Tokens, apperrors.AppError
 		}, nil
 	}
 	return auth.Tokens{}, ErrInvalidCredentials
+}
+
+func (s *Service) Refresh(userID, version int) (auth.AccessToken, apperrors.AppError) {
+	// check version with user version
+	if version != 2 {
+		return auth.AccessToken{}, apperrors.New("invalid_token_version", "token is invalid or expired") // keep message generic but internal code clear
+	}
+
+	token, err := s.JwtService.NewAccessToken(appjwt.AccessTokenClaims{UserID: userID})
+	if err != nil {
+		return auth.AccessToken{}, apperrors.New("generic_error", "failed to create access token")
+	}
+
+	return auth.AccessToken{AccessToken: token}, nil
 }

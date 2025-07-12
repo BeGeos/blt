@@ -7,12 +7,18 @@ import (
 	"github.com/joho/godotenv"
 )
 
+type AppConfig struct {
+	Name           string
+	PrometheusPort string
+}
+
 type Config struct {
 	Server         ServerConfig
 	Database       DatabaseConfig
 	Authentication AuthenticationConfig
 	Sentry         SentryConfig
 	Env            string
+	App            AppConfig
 }
 
 type ServerConfig struct {
@@ -52,6 +58,10 @@ func Load() (*Config, error) {
 
 		cfg = &Config{
 			Env: env,
+			App: AppConfig{
+				Name:           getEnv("APP_NAME", "go-hex"),
+				PrometheusPort: getEnv("PROMETHEUS_PORT", ":8081"),
+			},
 			Server: ServerConfig{
 				Port: getEnv("SERVER_PORT", ":8080"),
 			},

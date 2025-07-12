@@ -1,6 +1,7 @@
 package echo
 
 import (
+	"errors"
 	"go-hex/internal/adapter"
 	"go-hex/internal/config"
 	"go-hex/pkg/sentry"
@@ -10,6 +11,7 @@ import (
 
 	appmiddleware "go-hex/internal/adapter/http/echo/middleware"
 
+	"github.com/labstack/echo-contrib/echoprometheus"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"golang.org/x/time/rate"
@@ -32,6 +34,16 @@ func (s *EchoServer) Start() error {
 
 	// Init Echo
 	e := echo.New()
+	e.Use(echoprometheus.NewMiddleware(cfg.App.Name))
+
+	go func() {
+		// start metrics server on port 8081
+		metrics := echo.New() // this Echo will run on separate port 8081
+		metrics.GET("/metrics", echoprometheus.NewHandler())
+		if err := metrics.Start(cfg.App.PrometheusPort); err != nil && !errors.Is(err, http.ErrServerClosed) {
+			log.Fatal(err)
+		}
+	}()
 
 	mcfg := appmiddleware.NewMiddlewareConfig()
 

@@ -1,7 +1,6 @@
 package echo
 
 import (
-	"go-hex/pkg/logger"
 	"time"
 
 	"github.com/labstack/echo/v4"
@@ -57,7 +56,7 @@ func (c *MiddlewareConfig) Logger() middleware.RequestLoggerConfig {
 		LogMethod:     true,
 		LogError:      true,
 		HandleError:   true,
-		LogValuesFunc: logger.LogValuesFunc,
+		LogValuesFunc: LogValuesFunc,
 	}
 }
 

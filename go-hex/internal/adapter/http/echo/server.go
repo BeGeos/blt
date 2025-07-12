@@ -3,6 +3,8 @@ package echo
 import (
 	"go-hex/internal/adapter"
 	"go-hex/internal/config"
+	"go-hex/pkg/sentry"
+	"log"
 	"net/http"
 	"time"
 
@@ -20,6 +22,12 @@ func (s *EchoServer) Start() error {
 	cfg, err := config.Load()
 	if err != nil {
 		return err
+	}
+
+	// Activate Sentry for error tracking
+	tracing := &sentry.Client{Options: sentry.GetSentryClientOptions(cfg.Env)}
+	if err := tracing.Init(); err != nil {
+		log.Fatalf("sentry client init error: %v", err)
 	}
 
 	// Init Echo
@@ -49,6 +57,11 @@ func (s *EchoServer) Start() error {
 
 	e.HTTPErrorHandler = ErrorHandler
 	e.Validator = NewValidator()
+
+	// Add not debug setup
+	if cfg.Env != config.EnvDevelopment {
+		sentry.AddSentryMiddleware(e) // add sentry mdlw
+	}
 
 	RegisterRoutes(e)
 

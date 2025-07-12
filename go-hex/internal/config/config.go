@@ -11,6 +11,7 @@ type Config struct {
 	Server         ServerConfig
 	Database       DatabaseConfig
 	Authentication AuthenticationConfig
+	Sentry         SentryConfig
 	Env            string
 }
 
@@ -25,6 +26,10 @@ type DatabaseConfig struct {
 type AuthenticationConfig struct {
 	SigningKey string
 	ContextKey string
+}
+
+type SentryConfig struct {
+	Dsn string
 }
 
 var (
@@ -56,6 +61,9 @@ func Load() (*Config, error) {
 			Authentication: AuthenticationConfig{
 				SigningKey: getEnv("JWT_SIGNING_KEY", ""),
 				ContextKey: getEnv("JWT_CONTEXT_KEY", "jwt:token"),
+			},
+			Sentry: SentryConfig{
+				Dsn: getEnv("SENTRY_DSN", ""),
 			},
 		}
 	})

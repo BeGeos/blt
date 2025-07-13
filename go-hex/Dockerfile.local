@@ -1,0 +1,22 @@
+FROM golang:1.24-alpine
+
+# Install make and air for hot reloading
+RUN apk add --no-cache make
+RUN go install github.com/air-verse/air@latest
+
+# Prevents CGO dependencies
+ENV CGO_ENABLED=0 GOOS=linux GOARCH=amd64 GO_ENV=dev
+
+WORKDIR /app
+
+# Copy go mod files separately for better cache use
+COPY go.mod go.sum ./
+RUN go mod download
+
+# Copy source files
+COPY . .
+
+# Listen on this port (optional; for documentation)
+EXPOSE 8080
+
+CMD ["air", "-c", ".air.toml"]

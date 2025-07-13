@@ -1,0 +1,19 @@
+services:
+  go-hex:
+    container_name: go-hex
+    build:
+      context: .
+      dockerfile: Dockerfile.local
+    env_file: .env.dev
+    ports:
+      - "8080:1323"
+      - "8081:1324"
+    volumes:
+      - .:/app
+      - /app/tmp
+    networks:
+      - go-hex-network
+
+networks:
+  go-hex-network:
+    driver: bridge

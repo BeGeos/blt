@@ -39,6 +39,7 @@ func (s *EchoServer) Start() error {
 	go func() {
 		// start metrics server on port 8081
 		metrics := echo.New() // this Echo will run on separate port 8081
+		metrics.HideBanner = true
 		metrics.GET("/metrics", echoprometheus.NewHandler())
 		if err := metrics.Start(cfg.App.PrometheusPort); err != nil && !errors.Is(err, http.ErrServerClosed) {
 			log.Fatal(err)

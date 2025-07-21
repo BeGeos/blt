@@ -23,42 +23,21 @@ func NewAuthService(jwtService *appjwt.JwtService) *Service {
 }
 
 func (s *Service) Login(email, password string) (auth.Tokens, apperrors.AppError) {
-	type ResultCh struct {
-		token string
-		err   error
-	}
-	accessCh := make(chan ResultCh)
-	refreshCh := make(chan ResultCh)
-
 	// TODO: set proper user validation logic
 	if email == "admin@mail.com" && password == "password" {
-		go func(ch chan ResultCh) {
-			claims := appjwt.AccessTokenClaims{
-				UserID: 69,
-			}
-			token, err := s.JwtService.NewAccessToken(claims)
-			ch <- ResultCh{token: token, err: err}
-		}(accessCh)
+		accessToken, err := s.JwtService.NewAccessToken(69)
+		if err != nil {
+			return auth.Tokens{}, apperrors.New("generic_error", "failed to create access token")
+		}
 
-		go func(ch chan ResultCh) {
-			claims := appjwt.RefreshTokenClaims{
-				UserID:  69,
-				Version: 2, // replace with actual version check logic
-			}
-			token, err := s.JwtService.NewRefreshToken(claims)
-			ch <- ResultCh{token: token, err: err}
-		}(refreshCh)
-
-		accessResult := <-accessCh
-		refreshResult := <-refreshCh
-
-		if accessResult.err != nil || refreshResult.err != nil {
-			return auth.Tokens{}, apperrors.New("generic_error", "failed to create token")
+		refreshToken, err := s.JwtService.NewRefreshToken(69, 2)
+		if err != nil {
+			return auth.Tokens{}, apperrors.New("generic_error", "failed to create refresh token")
 		}
 
 		return auth.Tokens{
-			AccessToken:  accessResult.token,
-			RefreshToken: refreshResult.token,
+			AccessToken:  accessToken,
+			RefreshToken: refreshToken,
 		}, nil
 	}
 	return auth.Tokens{}, ErrInvalidCredentials
@@ -70,7 +49,7 @@ func (s *Service) Refresh(userID, version int) (auth.AccessToken, apperrors.AppE
 		return auth.AccessToken{}, apperrors.New("invalid_token_version", "token is invalid or expired") // keep message generic but internal code clear
 	}
 
-	token, err := s.JwtService.NewAccessToken(appjwt.AccessTokenClaims{UserID: userID})
+	token, err := s.JwtService.NewAccessToken(userID)
 	if err != nil {
 		return auth.AccessToken{}, apperrors.New("generic_error", "failed to create access token")
 	}

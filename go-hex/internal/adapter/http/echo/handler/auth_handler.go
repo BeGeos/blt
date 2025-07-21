@@ -74,7 +74,7 @@ func (h *AuthHandler) Refresh(c echo.Context) error {
 		return echo.ErrUnauthorized
 	}
 
-	data, err := h.authService.Refresh(claims.UserID, claims.Version)
+	data, err := h.authService.Refresh(claims.Sub, claims.Version)
 	if err != nil {
 		return echo.NewHTTPError(err.ToHttp(), err.Error())
 	}

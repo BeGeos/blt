@@ -8,21 +8,15 @@ type GetConfigArgs struct {
 	AuthenticationRequired bool
 }
 
-type AccessTokenClaims struct {
-	UserID int `json:"user_id"`
-}
-
-type RefreshTokenClaims struct {
-	UserID  int `json:"user_id"`
-	Version int `json:"version"`
-}
-
 type JwtClaims struct {
-	AccessTokenClaims
+	Typ string `json:"typ,omitempty"` // Type of the token, e.g., "access"
+	Sub int    `json:"sub,omitempty"` // Subject, typically the user ID
 	jwt.RegisteredClaims
 }
 
 type RefreshJwtClaims struct {
-	RefreshTokenClaims
+	Version int    `json:"version"`
+	Typ     string `json:"typ,omitempty"`
+	Sub     int    `json:"sub,omitempty"`
 	jwt.RegisteredClaims
 }

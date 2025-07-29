@@ -4,12 +4,12 @@ import (
 	"go-hex/internal/apps/apperrors"
 	"go-hex/internal/apps/auth"
 	appjwt "go-hex/internal/infrastructure/jwt"
+	"net/http"
 )
 
 var (
-	ErrInvalidCredentials  = apperrors.New("invalid_credentials", "invalid credentials")
-	ErrPersonNotFound      = apperrors.New("person_not_found", "person not found")
-	ErrInvalidTokenVersion = apperrors.New("invalid_token_version", "person not found")
+	ErrInvalidCredentials = apperrors.New("invalid_credentials", "invalid credentials", apperrors.WithHttpCode(http.StatusUnauthorized))
+	ErrPersonNotFound     = apperrors.New("person_not_found", "person not found", apperrors.WithHttpCode(http.StatusNotFound))
 )
 
 type Service struct {
@@ -27,12 +27,12 @@ func (s *Service) Login(email, password string) (auth.Tokens, apperrors.AppError
 	if email == "admin@mail.com" && password == "password" {
 		accessToken, err := s.JwtService.NewAccessToken(69)
 		if err != nil {
-			return auth.Tokens{}, apperrors.New("generic_error", "failed to create access token")
+			return auth.Tokens{}, appjwt.ErrFailedToken
 		}
 
 		refreshToken, err := s.JwtService.NewRefreshToken(69, 2)
 		if err != nil {
-			return auth.Tokens{}, apperrors.New("generic_error", "failed to create refresh token")
+			return auth.Tokens{}, appjwt.ErrFailedToken
 		}
 
 		return auth.Tokens{
@@ -46,12 +46,12 @@ func (s *Service) Login(email, password string) (auth.Tokens, apperrors.AppError
 func (s *Service) Refresh(userID, version int) (auth.AccessToken, apperrors.AppError) {
 	// check version with user version
 	if version != 2 {
-		return auth.AccessToken{}, apperrors.New("invalid_token_version", "token is invalid or expired") // keep message generic but internal code clear
+		return auth.AccessToken{}, appjwt.ErrInvalidTokenVersion
 	}
 
 	token, err := s.JwtService.NewAccessToken(userID)
 	if err != nil {
-		return auth.AccessToken{}, apperrors.New("generic_error", "failed to create access token")
+		return auth.AccessToken{}, appjwt.ErrFailedToken
 	}
 
 	return auth.AccessToken{AccessToken: token}, nil

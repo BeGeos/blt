@@ -1,13 +1,20 @@
 package jwt
 
 import (
+	"go-hex/internal/apps/apperrors"
 	"go-hex/internal/config"
+	"net/http"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
 )
 
 type JwtService struct{}
+
+var (
+	ErrInvalidTokenVersion = apperrors.New("invalid_token_version", "token is invalid or expired", apperrors.WithHttpCode(http.StatusUnauthorized))
+	ErrFailedToken         = apperrors.New("generic_error", "failed to create token", apperrors.WithHttpCode(http.StatusInternalServerError))
+)
 
 func (s *JwtService) NewAccessToken(userID int) (string, error) {
 	cfg, _ := config.Load()

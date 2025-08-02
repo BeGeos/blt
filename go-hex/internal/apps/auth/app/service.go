@@ -18,26 +18,22 @@ func NewAuthService(jwtService *appjwt.JwtService) *Service {
 
 func (s *Service) Login(email, password string) (auth.Tokens, *core.Error) {
 	// TODO: set proper user validation logic
-	const op = "auth.login"
+	const op = "auth.Login"
 
 	if email == "admin@mail.com" && password == "password" {
 		accessToken, err := s.JwtService.NewAccessToken(69)
 		if err != nil {
 			return auth.Tokens{}, &core.Error{
-				Code:    core.ErrInternal,
-				Message: "Failed to create access token",
-				Err:     err,
-				Op:      op,
+				Err: err,
+				Op:  op,
 			}
 		}
 
 		refreshToken, err := s.JwtService.NewRefreshToken(69, 2)
 		if err != nil {
 			return auth.Tokens{}, &core.Error{
-				Code:    core.ErrInternal,
-				Message: "Failed to create access token",
-				Err:     err,
-				Op:      op,
+				Err: err,
+				Op:  op,
 			}
 		}
 
@@ -46,20 +42,21 @@ func (s *Service) Login(email, password string) (auth.Tokens, *core.Error) {
 			RefreshToken: refreshToken,
 		}, nil
 	}
+
 	return auth.Tokens{}, &core.Error{
 		Code:    core.ErrInvalid,
-		Message: "Invalid credentials",
+		Message: "invalid credentials",
 		Op:      op,
 	}
 }
 
 func (s *Service) Refresh(userID, version int) (auth.AccessToken, *core.Error) {
-	const op = "auth.refresh"
+	const op = "auth.Refresh"
 	// check version with user version
 	if version != 2 {
 		return auth.AccessToken{}, &core.Error{
 			Code:    core.ErrInvalid,
-			Message: "Invalid token version or expired",
+			Message: "invalid token version",
 			Op:      op,
 		}
 	}
@@ -67,10 +64,8 @@ func (s *Service) Refresh(userID, version int) (auth.AccessToken, *core.Error) {
 	token, err := s.JwtService.NewAccessToken(userID)
 	if err != nil {
 		return auth.AccessToken{}, &core.Error{
-			Code:    core.ErrInternal,
-			Message: "Failed to create access token",
-			Err:     err,
-			Op:      op,
+			Err: err,
+			Op:  op,
 		}
 	}
 

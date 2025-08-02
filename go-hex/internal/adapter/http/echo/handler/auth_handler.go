@@ -2,6 +2,7 @@ package echo
 
 import (
 	auth "go-hex/internal/apps/auth/app"
+	"go-hex/internal/apps/core"
 	"go-hex/internal/config"
 	appjwt "go-hex/internal/infrastructure/jwt"
 	"net/http"
@@ -31,7 +32,7 @@ func (h *AuthHandler) Login(c echo.Context) error {
 
 	tokens, err := h.authService.Login(req.Email, req.Password)
 	if err != nil {
-		return echo.NewHTTPError(err.ToHttp(), err.Error())
+		return echo.NewHTTPError(core.ErrorHttp(err), core.ErrorMessage(err))
 	}
 	return c.JSON(http.StatusOK, tokens)
 }
@@ -76,7 +77,7 @@ func (h *AuthHandler) Refresh(c echo.Context) error {
 
 	data, err := h.authService.Refresh(claims.Sub, claims.Version)
 	if err != nil {
-		return echo.NewHTTPError(err.ToHttp(), err.Error())
+		return echo.NewHTTPError(core.ErrorHttp(err), core.ErrorMessage(err))
 	}
 
 	return c.JSON(http.StatusOK, data)

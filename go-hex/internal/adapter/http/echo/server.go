@@ -1,8 +1,8 @@
 package echo
 
 import (
-	"errors"
 	"go-hex/internal/adapter"
+	"go-hex/internal/adapter/repo/postgres"
 	"go-hex/internal/config"
 	"go-hex/pkg/sentry"
 	"log"
@@ -11,7 +11,6 @@ import (
 
 	appmiddleware "go-hex/internal/adapter/http/echo/middleware"
 
-	"github.com/labstack/echo-contrib/echoprometheus"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"golang.org/x/time/rate"
@@ -26,6 +25,12 @@ func (s *EchoServer) Start() error {
 		return err
 	}
 
+	// Connect to the database
+	db, err := postgres.NewDatabase(cfg.Database.DSN)
+	if err != nil {
+		panic("failed to connect to the database: " + err.Error())
+	}
+
 	// Activate Sentry for error tracking
 	tracing := &sentry.Client{Options: sentry.GetSentryClientOptions(cfg.Env)}
 	if err := tracing.Init(); err != nil {
@@ -34,17 +39,7 @@ func (s *EchoServer) Start() error {
 
 	// Init Echo
 	e := echo.New()
-	e.Use(echoprometheus.NewMiddleware(cfg.App.Name))
-
-	go func() {
-		// start metrics server on port 8081
-		metrics := echo.New() // this Echo will run on separate port 8081
-		metrics.HideBanner = true
-		metrics.GET("/metrics", echoprometheus.NewHandler())
-		if err := metrics.Start(cfg.App.PrometheusPort); err != nil && !errors.Is(err, http.ErrServerClosed) {
-			log.Fatal(err)
-		}
-	}()
+	e.JSONSerializer = &JsonSerializer{}
 
 	mcfg := appmiddleware.NewMiddlewareConfig()
 
@@ -71,12 +66,17 @@ func (s *EchoServer) Start() error {
 	e.HTTPErrorHandler = ErrorHandler
 	e.Validator = NewValidator()
 
-	// Add not debug setup
-	if cfg.Env != config.EnvDevelopment {
-		sentry.AddSentryMiddleware(e) // add sentry mdlw
+	switch cfg.Env {
+	case config.EnvProduction:
+		appmiddleware.AddSentryMiddleware(e) // add sentry echo mdlw
+	case config.EnvStaging:
+		appmiddleware.AddSentryMiddleware(e)
+	case config.EnvDevelopment:
+		db = db.Debug() // enable debug mode for development
+
 	}
 
-	RegisterRoutes(e)
+	RegisterRoutes(e, db)
 
 	return e.Start(cfg.Server.Port)
 }

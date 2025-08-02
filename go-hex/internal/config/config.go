@@ -26,7 +26,7 @@ type ServerConfig struct {
 }
 
 type DatabaseConfig struct {
-	URL string
+	DSN string
 }
 
 type AuthenticationConfig struct {
@@ -66,7 +66,7 @@ func Load() (*Config, error) {
 				Port: getEnv("SERVER_PORT", ":8080"),
 			},
 			Database: DatabaseConfig{
-				URL: getEnv("DATABASE_URL", ""),
+				DSN: getEnv("DATABASE_DSN", ""),
 			},
 			Authentication: AuthenticationConfig{
 				SigningKey: getEnv("JWT_SIGNING_KEY", ""),

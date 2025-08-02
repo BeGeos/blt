@@ -9,9 +9,10 @@ import (
 	echojwt "github.com/labstack/echo-jwt/v4"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
+	"gorm.io/gorm"
 )
 
-func registerAuthRoutes(e *echo.Echo) {
+func registerAuthRoutes(e *echo.Echo, db *gorm.DB) {
 	h := appecho.NewAuthHandler(
 		auth.NewAuthService(
 			appjwt.NewJwtService(),
@@ -42,6 +43,6 @@ func registerAuthRoutes(e *echo.Echo) {
 	maybeAuthenticated.POST("/refresh", h.Refresh).Name = "auth:refresh"
 }
 
-func RegisterRoutes(e *echo.Echo) {
-	registerAuthRoutes(e)
+func RegisterRoutes(e *echo.Echo, db *gorm.DB) {
+	registerAuthRoutes(e, db)
 }

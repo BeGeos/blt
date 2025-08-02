@@ -1,4 +1,4 @@
-package sentry
+package echo
 
 import (
 	sentryecho "github.com/getsentry/sentry-go/echo"

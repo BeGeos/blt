@@ -3,3 +3,6 @@
 
 bin/*
 tmp/*
+
+postgres_data/*
+postgres_data/

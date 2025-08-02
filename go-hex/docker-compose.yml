@@ -11,8 +11,45 @@ services:
     volumes:
       - .:/app
       - /app/tmp
+
+    depends_on:
+      - db
+
     networks:
       - go-hex-network
+
+  db:
+    image: postgres:16-alpine # Alpine for smaller size, or use postgres:16 for full version
+    container_name: db
+    restart: unless-stopped
+
+    environment:
+      POSTGRES_DB: go_db
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: password
+
+    ports:
+      - "5433:5432"
+
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./postgresql.conf:/etc/postgresql/postgresql.conf
+
+    networks:
+      - go-hex-network
+
+    command: >
+      postgres
+      -c config_file=/etc/postgresql/postgresql.conf
+      -c log_min_duration_statement=1000
+
+volumes:
+  postgres_data:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ./postgres_data # Use SSD storage path
 
 networks:
   go-hex-network:

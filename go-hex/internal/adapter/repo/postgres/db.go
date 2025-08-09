@@ -9,6 +9,7 @@ import (
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
+	"gorm.io/gorm/schema"
 )
 
 func setup(db *gorm.DB, env string) error {
@@ -60,6 +61,10 @@ func getGormConfig(env string) *gorm.Config {
 				return time.Now().UTC() // Always use UTC
 			},
 
+			NamingStrategy: schema.NamingStrategy{
+				SingularTable: false,
+			},
+
 			// === QUERY OPTIMIZATION ===
 			PrepareStmt:                              true,  // Use prepared statements (better performance + security)
 			DisableForeignKeyConstraintWhenMigrating: false, // Keep FK constraints
@@ -94,6 +99,9 @@ func getGormConfig(env string) *gorm.Config {
 		),
 		NowFunc: func() time.Time {
 			return time.Now().UTC()
+		},
+		NamingStrategy: schema.NamingStrategy{
+			SingularTable: false,
 		},
 		PrepareStmt:            true,
 		SkipDefaultTransaction: false, // Keep for data integrity
